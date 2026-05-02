@@ -1,97 +1,111 @@
 import { Component } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from './assets/vite.svg';
-import heroImg from './assets/hero.png';
-import './App.css';
+import './App.scss';
+import type { Character } from './types/character';
+import { RamapiService } from './api/ramapi-service';
+import { Search } from './components/search/search';
+import { CharacterList } from './components/character-list/character-list';
+import { LOCAL_STORAGE_KEYS } from './constants/local-storage';
+
+type State = {
+  characters: Character[];
+  searchValue: string;
+  isLoading: boolean;
+};
 
 export default class App extends Component {
+  private abortController: AbortController | null = null;
+  private lastRequestedSearchValue = '';
+
+  state: State = {
+    characters: [],
+    searchValue: '',
+    isLoading: false,
+  };
+
+  componentDidMount(): void {
+    const savedSearchValue = localStorage.getItem(LOCAL_STORAGE_KEYS.SEARCH_TERM) ?? '';
+
+    this.setState({ searchValue: savedSearchValue }, () => this.loadCharacters(savedSearchValue));
+  }
+
+  loadCharacters = async (searchValue: string) => {
+    const normalizedSearchValue = searchValue.trim();
+
+    this.lastRequestedSearchValue = normalizedSearchValue;
+
+    this.abortController?.abort();
+    this.abortController = new AbortController();
+
+    this.setState({ isLoading: true });
+
+    try {
+      const data = await RamapiService.getCharacters(
+        {
+          name: normalizedSearchValue,
+          page: 1,
+        },
+        this.abortController.signal
+      );
+
+      this.setState({
+        characters: data.results,
+        isLoading: false,
+      });
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
+
+      this.setState({
+        characters: [],
+        isLoading: false,
+      });
+    }
+  };
+
+  handleSearchChange = (value: string) => {
+    this.setState({
+      searchValue: value,
+    });
+  };
+
+  handleSearchSubmit = () => {
+    const normalizedSearchValue = this.state.searchValue.trim();
+
+    if (normalizedSearchValue === this.lastRequestedSearchValue) {
+      return;
+    }
+
+    if (normalizedSearchValue !== '') {
+      localStorage.setItem(LOCAL_STORAGE_KEYS.SEARCH_TERM, normalizedSearchValue);
+    } else {
+      localStorage.removeItem(LOCAL_STORAGE_KEYS.SEARCH_TERM);
+    }
+
+    this.loadCharacters(normalizedSearchValue);
+  };
+
+  renderContent() {
+    const { characters } = this.state;
+
+    if (characters.length === 0) {
+      return <p className="app__no-results">No characters found</p>;
+    }
+
+    return <CharacterList characters={characters} />;
+  }
+
   render() {
+    const { searchValue } = this.state;
+
     return (
-      <>
-        <section id="center">
-          <div className="hero">
-            <img src={heroImg} className="base" width="170" height="179" alt="" />
-            <img src={reactLogo} className="framework" alt="React logo" />
-            <img src={viteLogo} className="vite" alt="Vite logo" />
-          </div>
-          <div>
-            <h1>Get started</h1>
-            <p>
-              Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-            </p>
-          </div>
-        </section>
+      <div className="app">
+        <main>
+          <Search value={searchValue} onChange={this.handleSearchChange} onSubmit={this.handleSearchSubmit} />
 
-        <div className="ticks"></div>
-
-        <section id="next-steps">
-          <div id="docs">
-            <svg className="icon" role="presentation" aria-hidden="true">
-              <use href="/icons.svg#documentation-icon"></use>
-            </svg>
-            <h2>Documentation</h2>
-            <p>Your questions, answered</p>
-            <ul>
-              <li>
-                <a href="https://vite.dev/" target="_blank" rel="noopener noreferrer">
-                  <img className="logo" src={viteLogo} alt="" />
-                  Explore Vite
-                </a>
-              </li>
-              <li>
-                <a href="https://react.dev/" target="_blank" rel="noopener noreferrer">
-                  <img className="button-icon" src={reactLogo} alt="" />
-                  Learn more
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div id="social">
-            <svg className="icon" role="presentation" aria-hidden="true">
-              <use href="/icons.svg#social-icon"></use>
-            </svg>
-            <h2>Connect with us</h2>
-            <p>Join the Vite community</p>
-            <ul>
-              <li>
-                <a href="https://github.com/vitejs/vite" target="_blank" rel="noopener noreferrer">
-                  <svg className="button-icon" role="presentation" aria-hidden="true">
-                    <use href="/icons.svg#github-icon"></use>
-                  </svg>
-                  GitHub
-                </a>
-              </li>
-              <li>
-                <a href="https://chat.vite.dev/" target="_blank" rel="noopener noreferrer">
-                  <svg className="button-icon" role="presentation" aria-hidden="true">
-                    <use href="/icons.svg#discord-icon"></use>
-                  </svg>
-                  Discord
-                </a>
-              </li>
-              <li>
-                <a href="https://x.com/vite_js" target="_blank" rel="noopener noreferrer">
-                  <svg className="button-icon" role="presentation" aria-hidden="true">
-                    <use href="/icons.svg#x-icon"></use>
-                  </svg>
-                  X.com
-                </a>
-              </li>
-              <li>
-                <a href="https://bsky.app/profile/vite.dev" target="_blank" rel="noopener noreferrer">
-                  <svg className="button-icon" role="presentation" aria-hidden="true">
-                    <use href="/icons.svg#bluesky-icon"></use>
-                  </svg>
-                  Bluesky
-                </a>
-              </li>
-            </ul>
-          </div>
-        </section>
-
-        <div className="ticks"></div>
-        <section id="spacer"></section>
-      </>
+          {this.renderContent()}
+        </main>
+      </div>
     );
   }
 }

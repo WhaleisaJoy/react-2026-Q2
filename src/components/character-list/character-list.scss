@@ -1,0 +1,9 @@
+.character-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 20px;
+
+  @media (max-width: 991px) {
+    grid-template-columns: repeat(1, minmax(220px, 1fr));
+  }
+}
