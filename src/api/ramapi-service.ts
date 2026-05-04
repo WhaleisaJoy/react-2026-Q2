@@ -21,15 +21,30 @@ export class RamapiService {
     }
 
     const queryString = searchParams.toString();
-
     const url = queryString ? `${RAMAPI_ROUTES.CHARACTERS}?${queryString}` : RAMAPI_ROUTES.CHARACTERS;
 
     const res = await fetch(`${BASE_URL}${url}`, { signal });
 
     if (!res.ok) {
-      throw new Error(`Could not fetch characters, status: ${res.status}`);
+      throw new Error(getCharactersErrorMessage(res.status));
     }
 
     return await res.json();
   }
+}
+
+function getCharactersErrorMessage(status: number): string {
+  if (status === 404) {
+    return 'No characters found. Try another search term.';
+  }
+
+  if (status >= 400 && status < 500) {
+    return 'The request was incorrect. Please check your search and try again.';
+  }
+
+  if (status >= 500) {
+    return 'Something went wrong on the server. Please try again later.';
+  }
+
+  return 'Something went wrong. Please try again later.';
 }

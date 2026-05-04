@@ -4,7 +4,7 @@
   padding: 20px;
   color: var(--text-main);
   background-color: var(--card-bg);
-  border: 1px solid var(--card-border);
+  border: 1px solid var(--accent);
   border-radius: 12px;
 
   background: linear-gradient(
@@ -95,7 +95,7 @@
       padding: 7px 0;
 
       &:not(:last-of-type) {
-        border-bottom: 1px solid color-mix(in srgb, var(--card-border) 35%, transparent);
+        border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
       }
     }
 
@@ -116,10 +116,10 @@
       height: 30px;
       font-size: 0.8em;
       color: var(--text-muted);
-      background: color-mix(in srgb, var(--card-border) 15%, transparent);
-      border: 1px solid color-mix(in srgb, var(--card-border) 85%, transparent);
+      background: color-mix(in srgb, var(--accent) 15%, transparent);
+      border: 1px solid color-mix(in srgb, var(--accent) 85%, transparent);
       border-radius: 50%;
-      box-shadow: 0 0 18px color-mix(in srgb, var(--card-border) 45%, transparent);
+      box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent);
     }
 
     &-value {

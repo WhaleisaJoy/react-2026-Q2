@@ -1,0 +1,12 @@
+.error-boundary-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+}
+
+.error-boundary__button {
+  display: block;
+  margin: 30px auto 0;
+}

@@ -8,7 +8,7 @@ interface CharacterListProps {
 }
 
 export class CharacterList extends Component<CharacterListProps> {
-  public render() {
+  render() {
     return (
       <div className="character-list">
         {this.props.characters.map((character) => (

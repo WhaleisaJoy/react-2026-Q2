@@ -5,11 +5,16 @@ import { RamapiService } from './api/ramapi-service';
 import { Search } from './components/search/search';
 import { CharacterList } from './components/character-list/character-list';
 import { LOCAL_STORAGE_KEYS } from './constants/local-storage';
+import Loader from './components/shared/loader/loader';
+import { ErrorTestButton } from './components/error-test-button/error-test-button';
+import { ErrorBoundary } from './components/error-boundary/error-boundary';
+import { Header } from './components/header/header';
 
 type State = {
   characters: Character[];
   searchValue: string;
   isLoading: boolean;
+  error: string | null;
 };
 
 export default class App extends Component {
@@ -20,6 +25,7 @@ export default class App extends Component {
     characters: [],
     searchValue: '',
     isLoading: false,
+    error: null,
   };
 
   componentDidMount(): void {
@@ -36,7 +42,10 @@ export default class App extends Component {
     this.abortController?.abort();
     this.abortController = new AbortController();
 
-    this.setState({ isLoading: true });
+    this.setState({
+      isLoading: true,
+      error: null,
+    });
 
     try {
       const data = await RamapiService.getCharacters(
@@ -52,13 +61,14 @@ export default class App extends Component {
         isLoading: false,
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
+      if (error instanceof DOMException && error.name === 'AbortError') {
         return;
       }
 
       this.setState({
         characters: [],
         isLoading: false,
+        error: error instanceof Error ? error.message : 'An unexpected error occurred. Please try again later.',
       });
     }
   };
@@ -86,7 +96,20 @@ export default class App extends Component {
   };
 
   renderContent() {
-    const { characters } = this.state;
+    const { characters, isLoading, error } = this.state;
+
+    if (isLoading) {
+      return <Loader />;
+    }
+
+    if (error) {
+      return (
+        <div className="app-error" role="alert">
+          <h3 className="app-error__title">Oops!</h3>
+          <p>{error}</p>
+        </div>
+      );
+    }
 
     if (characters.length === 0) {
       return <p className="app__no-results">No characters found</p>;
@@ -99,13 +122,21 @@ export default class App extends Component {
     const { searchValue } = this.state;
 
     return (
-      <div className="app">
-        <main>
-          <Search value={searchValue} onChange={this.handleSearchChange} onSubmit={this.handleSearchSubmit} />
+      <ErrorBoundary>
+        <div className="app">
+          <Header>
+            <Search value={searchValue} onChange={this.handleSearchChange} onSubmit={this.handleSearchSubmit} />
+          </Header>
 
-          {this.renderContent()}
-        </main>
-      </div>
+          <main className="app-main">
+            <div className="error-button-wrapper">
+              <ErrorTestButton />
+            </div>
+
+            {this.renderContent()}
+          </main>
+        </div>
+      </ErrorBoundary>
     );
   }
 }

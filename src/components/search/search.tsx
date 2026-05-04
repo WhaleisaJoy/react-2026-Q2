@@ -1,13 +1,14 @@
 import { Component, type ChangeEvent, type SubmitEvent } from 'react';
+import { Button } from '../shared/button/button';
 import './search.scss';
 
-interface SearchProps {
+interface Props {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
 }
 
-export class Search extends Component<SearchProps> {
+export class Search extends Component<Props> {
   handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     this.props.onChange(event.target.value);
   };
@@ -17,19 +18,20 @@ export class Search extends Component<SearchProps> {
     this.props.onSubmit();
   };
 
-  public render() {
+  render() {
     return (
       <form className="search" onSubmit={this.handleSubmit}>
         <input
+          id="search"
+          name="search"
           className="search__field"
           value={this.props.value}
           type="text"
           placeholder="Search for characters..."
           onChange={this.handleChange}
         />
-        <button className="search__button" type="submit">
-          Search
-        </button>
+
+        <Button type="submit">Search</Button>
       </form>
     );
   }

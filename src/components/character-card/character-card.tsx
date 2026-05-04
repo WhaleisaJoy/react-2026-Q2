@@ -7,7 +7,7 @@ interface CharacterCardProps {
 }
 
 export class CharacterCard extends Component<CharacterCardProps> {
-  public render() {
+  render() {
     const { character } = this.props;
 
     return (
