@@ -82,6 +82,10 @@ export default class App extends Component {
   handleSearchSubmit = () => {
     const normalizedSearchValue = this.state.searchValue.trim();
 
+    this.setState({
+      searchValue: normalizedSearchValue,
+    });
+
     if (normalizedSearchValue === this.lastRequestedSearchValue) {
       return;
     }
