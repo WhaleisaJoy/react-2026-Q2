@@ -28,6 +28,7 @@ export class Search extends Component<Props> {
           value={this.props.value}
           type="text"
           placeholder="Search for characters..."
+          aria-label="Search characters"
           onChange={this.handleChange}
         />
 

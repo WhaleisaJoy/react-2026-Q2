@@ -1,7 +1,7 @@
 import type { CharactersResponse } from '../types/character';
 import { RAMAPI_ROUTES } from './ramapi-routes';
 
-const BASE_URL = 'https://rickandmortyapi.com/api';
+export const BASE_URL = 'https://rickandmortyapi.com/api';
 
 interface GetCharactersParams {
   name?: string;
