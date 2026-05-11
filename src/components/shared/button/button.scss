@@ -1,0 +1,26 @@
+.button {
+  --color: var(--accent);
+
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  background-color: color-mix(in srgb, var(--color) 40%, transparent);
+  color: var(--text-main);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &--error {
+    --color: var(--red);
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: color-mix(in srgb, var(--color) 50%, transparent);
+      box-shadow: 0 5px 10px color-mix(in srgb, var(--color) 40%, transparent);
+    }
+  }
+  &:active {
+    transform: translateY(2px);
+  }
+}

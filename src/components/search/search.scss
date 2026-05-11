@@ -1,0 +1,16 @@
+.search {
+  max-width: var(--max-width);
+  display: flex;
+  gap: 10px;
+  margin-inline: auto;
+
+  &__field {
+    flex: 1;
+    padding: 12px 14px;
+    color: var(--text-main);
+    font-size: 1em;
+    background-color: var(--card-bg);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+  }
+}
