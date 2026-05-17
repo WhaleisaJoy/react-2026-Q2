@@ -6,6 +6,7 @@
 
   --text-main: #f4f7f5;
   --text-muted: #8ea3af;
+  --text-dark: #031018;
 
   --green: #97ce4c;
   --red: #ff6b6b;
@@ -26,6 +27,12 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 #root {
