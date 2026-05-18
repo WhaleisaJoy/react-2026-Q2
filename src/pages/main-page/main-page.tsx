@@ -1,15 +1,17 @@
-import { useCallback, useEffect, useState } from 'react';
+import './main-page.scss';
+import { useEffect, useState } from 'react';
 import { CharacterList } from '../../components/character-list/character-list';
 import { ErrorTestButton } from '../../components/error-test-button/error-test-button';
 import { Search } from '../../components/search/search';
 import { Loader } from '../../components/shared/loader/loader';
 import type { Character } from '../../types/character';
 import { LOCAL_STORAGE_KEYS } from '../../constants/local-storage';
-import { RamapiService } from '../../api/ramapi-service';
+import { getCharacters } from '../../api/ramapi-service';
 import { Pagination } from '../../components/pagination/pagination';
-import { useSearchParams } from 'react-router';
-import { getValidPage } from '../../utils/utils';
+import { Outlet } from 'react-router';
+import { getValidDetailsId, getValidPage } from '../../utils/utils';
 import { useLocalStorage } from '../../hooks/use-local-storage';
+import { useUrlParams } from '../../hooks/use-url-params';
 
 export function MainPage() {
   const {
@@ -18,8 +20,9 @@ export function MainPage() {
     removeValue: removeSubmittedSearchValue,
   } = useLocalStorage(LOCAL_STORAGE_KEYS.SEARCH_TERM);
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { searchParams, updateUrlParams } = useUrlParams();
 
+  const selectedCharacterId = getValidDetailsId(searchParams.get('details'));
   const currentPage = getValidPage(searchParams.get('page'));
   const [totalPages, setTotalPages] = useState(1);
 
@@ -29,23 +32,20 @@ export function MainPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const updatePageInUrl = useCallback(
-    (page: number, replace = false) => {
-      const newSearchParams = new URLSearchParams(searchParams);
-
-      newSearchParams.set('page', String(page));
-      setSearchParams(newSearchParams, { replace });
-    },
-    [searchParams, setSearchParams]
-  );
-
   useEffect(() => {
     const pageParam = searchParams.get('page');
 
     if (pageParam !== String(currentPage)) {
-      updatePageInUrl(currentPage, true);
+      updateUrlParams(
+        {
+          page: currentPage,
+        },
+        {
+          replace: true,
+        }
+      );
     }
-  }, [currentPage, searchParams, updatePageInUrl]);
+  }, [currentPage, searchParams, updateUrlParams]);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -54,7 +54,7 @@ export function MainPage() {
       const normalizedSearchValue = submittedSearchValue.trim();
 
       try {
-        const data = await RamapiService.getCharacters(
+        const data = await getCharacters(
           {
             name: normalizedSearchValue,
             page: currentPage,
@@ -108,7 +108,10 @@ export function MainPage() {
 
     setIsLoading(true);
     setError(null);
-    updatePageInUrl(1);
+    updateUrlParams({
+      page: 1,
+      details: null,
+    });
   };
 
   const handlePageChange = (page: number) => {
@@ -118,7 +121,22 @@ export function MainPage() {
 
     setIsLoading(true);
     setError(null);
-    updatePageInUrl(page);
+    updateUrlParams({
+      page,
+      details: null,
+    });
+  };
+
+  const openDetails = (id: number) => {
+    updateUrlParams({
+      details: id,
+    });
+  };
+
+  const closeDetails = () => {
+    updateUrlParams({
+      details: null,
+    });
   };
 
   const renderContent = () => {
@@ -139,24 +157,38 @@ export function MainPage() {
       return <p className="app__no-results">No characters found</p>;
     }
 
-    return <CharacterList characters={characters} />;
+    return (
+      <CharacterList
+        characters={characters}
+        selectedCharacterId={selectedCharacterId}
+        onSelectCharacter={openDetails}
+      />
+    );
   };
 
   const shouldShowPagination = !isLoading && !error && characters.length > 0 && totalPages > 1;
 
   return (
-    <>
-      <Search value={searchValue} onChange={handleSearchChange} onSubmit={handleSearchSubmit} />
+    <div className={`main-page ${selectedCharacterId ? 'main-page--with-details' : ''}`}>
+      <section className="main-page__content">
+        <Search value={searchValue} onChange={handleSearchChange} onSubmit={handleSearchSubmit} />
 
-      <div className="error-button-wrapper">
-        <ErrorTestButton />
-      </div>
+        <div className="error-button-wrapper">
+          <ErrorTestButton />
+        </div>
 
-      {renderContent()}
+        {renderContent()}
 
-      {shouldShowPagination && (
-        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+        {shouldShowPagination && (
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+        )}
+      </section>
+
+      {selectedCharacterId && (
+        <aside className="main-page__details">
+          <Outlet context={{ selectedCharacterId, onClose: closeDetails }} />
+        </aside>
       )}
-    </>
+    </div>
   );
 }

@@ -7,3 +7,13 @@ export function getValidPage(value: string | null): number {
 
   return page;
 }
+
+export function getValidDetailsId(value: string | null): number | null {
+  const id = Number(value);
+
+  if (!Number.isInteger(id) || id < 1) {
+    return null;
+  }
+
+  return id;
+}

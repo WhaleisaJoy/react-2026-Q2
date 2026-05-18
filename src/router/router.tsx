@@ -4,6 +4,7 @@ import { MainPage } from '../pages/main-page/main-page';
 import { AboutPage } from '../pages/about-page/about-page';
 import { NotFoundPage } from '../pages/not-found-page/not-found-page';
 import { APP_ROUTES } from './routes';
+import { CharacterDetails } from '../components/character-details/character-details';
 
 export const router = createBrowserRouter([
   {
@@ -11,8 +12,14 @@ export const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        index: true,
+        path: '',
         element: <MainPage />,
+        children: [
+          {
+            index: true,
+            element: <CharacterDetails />,
+          },
+        ],
       },
       {
         path: APP_ROUTES.ABOUT.path,

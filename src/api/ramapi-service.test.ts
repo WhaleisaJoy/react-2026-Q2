@@ -1,6 +1,6 @@
-import { mockCharactersResponse } from '../test-utils/mocks/characters';
+import { mockCharacters, mockCharactersResponse } from '../test-utils/mocks/characters';
 import { RAMAPI_ROUTES } from './ramapi-routes';
-import { BASE_URL, RamapiService } from './ramapi-service';
+import { BASE_URL, getCharacter, getCharacters } from './ramapi-service';
 
 describe('RamapiService', () => {
   beforeEach(() => {
@@ -13,7 +13,7 @@ describe('RamapiService', () => {
       json: async () => mockCharactersResponse,
     } as Response);
 
-    const result = await RamapiService.getCharacters();
+    const result = await getCharacters();
 
     expect(fetch).toHaveBeenCalledWith(`${BASE_URL}${RAMAPI_ROUTES.CHARACTERS}`, { signal: undefined });
     expect(result).toEqual(mockCharactersResponse);
@@ -25,7 +25,7 @@ describe('RamapiService', () => {
       json: async () => mockCharactersResponse,
     } as Response);
 
-    await RamapiService.getCharacters({
+    await getCharacters({
       name: 'rick',
       page: 1,
     });
@@ -41,7 +41,7 @@ describe('RamapiService', () => {
       json: async () => mockCharactersResponse,
     } as Response);
 
-    await RamapiService.getCharacters({
+    await getCharacters({
       name: '  morty   ',
       page: 1,
     });
@@ -59,7 +59,7 @@ describe('RamapiService', () => {
 
     const abortController = new AbortController();
 
-    await RamapiService.getCharacters(
+    await getCharacters(
       {
         name: 'rick',
         page: 1,
@@ -79,7 +79,7 @@ describe('RamapiService', () => {
     } as Response);
 
     await expect(
-      RamapiService.getCharacters({
+      getCharacters({
         name: 'unknown character',
         page: 1,
       })
@@ -93,7 +93,7 @@ describe('RamapiService', () => {
     } as Response);
 
     await expect(
-      RamapiService.getCharacters({
+      getCharacters({
         name: 'rick',
         page: 1,
       })
@@ -107,7 +107,7 @@ describe('RamapiService', () => {
     } as Response);
 
     await expect(
-      RamapiService.getCharacters({
+      getCharacters({
         name: 'rick',
         page: 1,
       })
@@ -121,10 +121,44 @@ describe('RamapiService', () => {
     } as Response);
 
     await expect(
-      RamapiService.getCharacters({
+      getCharacters({
         name: 'rick',
         page: 1,
       })
     ).rejects.toThrow('Something went wrong. Please try again later.');
+  });
+
+  it('should fetch character by id', async () => {
+    const mockCharacter = mockCharacters[0];
+
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockCharacter,
+    } as Response);
+
+    const result = await getCharacter(mockCharacter.id);
+
+    expect(fetch).toHaveBeenCalledWith(`${BASE_URL}${RAMAPI_ROUTES.CHARACTERS}/${mockCharacter.id}`, {
+      signal: undefined,
+    });
+    expect(result).toEqual(mockCharacter);
+  });
+
+  it('should throw meaningful details error for 404 response', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: false,
+      status: 404,
+    } as Response);
+
+    await expect(getCharacter(999)).rejects.toThrow('Character details were not found.');
+  });
+
+  it('should throw meaningful details error for 4xx response', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: false,
+      status: 400,
+    } as Response);
+
+    await expect(getCharacter(1)).rejects.toThrow('Unable to load character details. Please try another character.');
   });
 });

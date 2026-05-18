@@ -1,22 +1,38 @@
 .character-card {
-  display: flex;
-  gap: 20px;
   padding: 20px;
   color: var(--text-main);
   background-color: var(--card-bg);
   border: 1px solid var(--accent);
   border-radius: 12px;
-
   background: linear-gradient(
     135deg,
     color-mix(in srgb, var(--card-bg) 10%, var(--card-bg-light)),
     var(--card-bg) 100%
   );
+  cursor: pointer;
+  transition: all 0.3s ease;
 
-  box-shadow:
-    0 0 0 1px rgba(135, 209, 219, 0.08) inset,
-    0 0 32px rgba(53, 201, 221, 0.16),
-    0 28px 70px rgba(0, 0, 0, 0.55);
+  &:not(&--selected):hover {
+    transform: translateY(-2px) scale(1.01);
+    z-index: 1;
+  }
+
+  &--selected {
+    box-shadow:
+      0 0 15px 0px var(--accent) inset,
+      0 0 10px var(--accent),
+      0 0 0px 1px color-mix(in srgb, var(--accent) 70%, transparent);
+    cursor: default;
+    z-index: 1;
+  }
+
+  &__button {
+    all: unset;
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    height: 100%;
+  }
 
   &__image-wrapper {
     align-self: center;

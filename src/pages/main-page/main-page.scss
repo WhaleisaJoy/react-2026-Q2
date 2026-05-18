@@ -1,0 +1,20 @@
+.main-page {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+
+  &--with-details {
+    grid-template-columns: minmax(315px, 1fr) minmax(235px, 300px);
+    align-items: start;
+    gap: 14px;
+  }
+
+  &__content {
+    min-width: 0;
+  }
+
+  &__details {
+    position: sticky;
+    top: 10px;
+  }
+}

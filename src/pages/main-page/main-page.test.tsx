@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { RamapiService } from '../../api/ramapi-service';
+import { getCharacters } from '../../api/ramapi-service';
 import { LOCAL_STORAGE_KEYS } from '../../constants/local-storage';
 import userEvent from '@testing-library/user-event';
 import { mockCharacters, mockCharactersResponse } from '../../test-utils/mocks/characters';
@@ -14,24 +14,22 @@ const renderMainPage = (path = '/') =>
   );
 
 vi.mock('../../api/ramapi-service', () => ({
-  RamapiService: {
-    getCharacters: vi.fn(),
-  },
+  getCharacters: vi.fn(),
 }));
 
 describe('MainPage', () => {
   beforeEach(() => {
-    vi.mocked(RamapiService.getCharacters).mockResolvedValue(mockCharactersResponse);
+    vi.mocked(getCharacters).mockResolvedValue(mockCharactersResponse);
   });
 
   it('should load first page of characters on initial render', async () => {
     renderMainPage();
 
     await waitFor(() => {
-      expect(RamapiService.getCharacters).toHaveBeenCalledTimes(1);
+      expect(getCharacters).toHaveBeenCalledTimes(1);
     });
 
-    expect(RamapiService.getCharacters).toHaveBeenCalledWith(
+    expect(getCharacters).toHaveBeenCalledWith(
       {
         name: '',
         page: 1,
@@ -54,7 +52,7 @@ describe('MainPage', () => {
     expect(screen.getByRole('textbox', { name: /search characters/i })).toHaveValue('rick');
 
     await waitFor(() => {
-      expect(RamapiService.getCharacters).toHaveBeenCalledWith(
+      expect(getCharacters).toHaveBeenCalledWith(
         {
           name: 'rick',
           page: 1,
@@ -77,7 +75,7 @@ describe('MainPage', () => {
 
     expect(input).toHaveValue('morty');
     await waitFor(() => {
-      expect(RamapiService.getCharacters).toHaveBeenCalledWith(
+      expect(getCharacters).toHaveBeenCalledWith(
         {
           name: 'morty',
           page: 1,
@@ -117,7 +115,7 @@ describe('MainPage', () => {
     expect(localStorage.getItem(LOCAL_STORAGE_KEYS.SEARCH_TERM)).toBe('morty');
 
     await waitFor(() => {
-      expect(RamapiService.getCharacters).toHaveBeenCalledWith(
+      expect(getCharacters).toHaveBeenCalledWith(
         {
           name: 'morty',
           page: 1,
@@ -150,16 +148,16 @@ describe('MainPage', () => {
     renderMainPage();
 
     await waitFor(() => {
-      expect(RamapiService.getCharacters).toHaveBeenCalledTimes(1);
+      expect(getCharacters).toHaveBeenCalledTimes(1);
     });
 
     await user.click(screen.getByRole('button', { name: /search/i }));
 
-    expect(RamapiService.getCharacters).toHaveBeenCalledTimes(1);
+    expect(getCharacters).toHaveBeenCalledTimes(1);
   });
 
   it('should show no results message when API return empty results', async () => {
-    vi.mocked(RamapiService.getCharacters).mockResolvedValueOnce({
+    vi.mocked(getCharacters).mockResolvedValueOnce({
       info: {
         count: 0,
         pages: 0,
@@ -175,9 +173,7 @@ describe('MainPage', () => {
   });
 
   it('shows meaningful error message when API request fails', async () => {
-    vi.mocked(RamapiService.getCharacters).mockRejectedValueOnce(
-      new Error('No characters found. Try another search term.')
-    );
+    vi.mocked(getCharacters).mockRejectedValueOnce(new Error('No characters found. Try another search term.'));
 
     renderMainPage();
 
@@ -187,7 +183,7 @@ describe('MainPage', () => {
   });
 
   it('should show pagination after characters are loaded when there are multiple pages', async () => {
-    vi.mocked(RamapiService.getCharacters).mockResolvedValue({
+    vi.mocked(getCharacters).mockResolvedValue({
       ...mockCharactersResponse,
       info: {
         ...mockCharactersResponse.info,
