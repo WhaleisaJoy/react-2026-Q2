@@ -1,0 +1,61 @@
+.about-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  &__title {
+    margin: 0 0 5px 0;
+    font-size: 28px;
+  }
+
+  &__sections-wrapper {
+    display: flex;
+    gap: 20px;
+
+    .section {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    width: min(100%, 1320px);
+    padding: 20px;
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+
+    &-title {
+      margin: 0 0 12px;
+    }
+
+    &-description {
+      margin-bottom: 20px;
+    }
+
+    &-link {
+      display: block;
+      margin-top: auto;
+      padding: 7px 17px;
+      border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+      border-radius: 8px;
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: var(--text-main);
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  @media (max-width: 576px) {
+    &__sections-wrapper {
+      flex-direction: column;
+    }
+  }
+}

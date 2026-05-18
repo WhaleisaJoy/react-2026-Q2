@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { CharacterList } from '../../components/character-list/character-list';
 import { ErrorTestButton } from '../../components/error-test-button/error-test-button';
-import { Header } from '../../components/header/header';
 import { Search } from '../../components/search/search';
 import { Loader } from '../../components/shared/loader/loader';
 import type { Character } from '../../types/character';
@@ -142,22 +141,18 @@ export function MainPage() {
   const shouldShowPagination = !isLoading && !error && characters.length > 0 && totalPages > 1;
 
   return (
-    <div className="app">
-      <Header>
-        <Search value={searchValue} onChange={handleSearchChange} onSubmit={handleSearchSubmit} />
-      </Header>
+    <>
+      <Search value={searchValue} onChange={handleSearchChange} onSubmit={handleSearchSubmit} />
 
-      <main className="app-main">
-        <div className="error-button-wrapper">
-          <ErrorTestButton />
-        </div>
+      <div className="error-button-wrapper">
+        <ErrorTestButton />
+      </div>
 
-        {renderContent()}
+      {renderContent()}
 
-        {shouldShowPagination && (
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
-        )}
-      </main>
-    </div>
+      {shouldShowPagination && (
+        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+      )}
+    </>
   );
 }
