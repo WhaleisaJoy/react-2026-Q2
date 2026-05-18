@@ -1,12 +1,28 @@
-import { Component, type ReactNode } from 'react';
+import { Link, NavLink } from 'react-router';
 import './header.scss';
+import { APP_ROUTES } from '../../router/routes';
 
-interface Props {
-  children?: ReactNode;
-}
+export function Header() {
+  return (
+    <header className="app-header">
+      <Link to={APP_ROUTES.MAIN.to} className="app-header__logo">
+        RickVerse Search
+      </Link>
 
-export class Header extends Component<Props> {
-  render() {
-    return <header className="app-header">{this.props.children}</header>;
-  }
+      <nav className="app-header__nav" aria-label="Main Navigation">
+        <NavLink
+          to={APP_ROUTES.MAIN.to}
+          className={({ isActive }) => `app-header__nav-link ${isActive ? 'app-header__nav-link--active' : ''}`}
+        >
+          Main
+        </NavLink>
+        <NavLink
+          to={APP_ROUTES.ABOUT.to}
+          className={({ isActive }) => `app-header__nav-link ${isActive ? 'app-header__nav-link--active' : ''}`}
+        >
+          About
+        </NavLink>
+      </nav>
+    </header>
+  );
 }

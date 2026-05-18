@@ -1,28 +1,20 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import { Button } from '../shared/button/button';
 
-interface State {
-  shouldThrowError: boolean;
-}
+export function ErrorTestButton() {
+  const [shouldThrowError, setShouldThrowError] = useState(false);
 
-export class ErrorTestButton extends Component {
-  state: State = {
-    shouldThrowError: false,
+  const handleClick = () => {
+    setShouldThrowError(true);
   };
 
-  handleClick = () => {
-    this.setState({ shouldThrowError: true });
-  };
-
-  render() {
-    if (this.state.shouldThrowError) {
-      throw new Error('Test application error');
-    }
-
-    return (
-      <Button className="button--error" onClick={this.handleClick}>
-        Throw error
-      </Button>
-    );
+  if (shouldThrowError) {
+    throw new Error('Test application error');
   }
+
+  return (
+    <Button className="button--error" onClick={handleClick}>
+      Throw error
+    </Button>
+  );
 }

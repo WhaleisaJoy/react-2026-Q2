@@ -3,6 +3,7 @@
   display: flex;
   gap: 10px;
   margin-inline: auto;
+  margin-bottom: 15px;
 
   &__field {
     flex: 1;
@@ -12,5 +13,9 @@
     background-color: var(--card-bg);
     border: 1px solid var(--accent);
     border-radius: 8px;
+  }
+
+  @media (max-width: 576px) {
+    flex-direction: column;
   }
 }

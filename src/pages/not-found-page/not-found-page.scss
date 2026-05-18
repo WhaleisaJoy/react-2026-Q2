@@ -1,0 +1,79 @@
+.not-found-page {
+  text-align: center;
+
+  &__code {
+    margin: 0 0 25px 0;
+    color: transparent;
+    color: var(--accent);
+    font-size: 120px;
+    line-height: 1;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    -webkit-text-stroke: 2px var(--text-main);
+    text-shadow:
+      0 0 12px color-mix(in srgb, var(--accent) 85%, transparent),
+      0 0 34px color-mix(in srgb, var(--accent) 50%, transparent),
+      0 0 86px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+
+  &__text {
+    margin-bottom: 30px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  &__link {
+    min-width: 180px;
+    padding: 10px 20px;
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    color: var(--accent);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    box-shadow:
+      inset 0 0 18px color-mix(in srgb, var(--accent) 25%, transparent),
+      0 0 20px color-mix(in srgb, var(--accent) 8%, transparent);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      color: var(--text-main);
+      box-shadow:
+        0 0 24px color-mix(in srgb, var(--accent) 25%, transparent),
+        inset 0 0 20px color-mix(in srgb, var(--accent) 28%, transparent);
+    }
+
+    &--primary {
+      color: var(--text-main);
+
+      background:
+        radial-gradient(circle at top, color-mix(in srgb, var(--accent) 25%, transparent), transparent 44%),
+        linear-gradient(
+          135deg,
+          color-mix(in srgb, var(--accent) 40%, transparent),
+          color-mix(in srgb, var(--accent) 25%, transparent)
+        ),
+        color-mix(in srgb, var(--accent) 15%, transparent);
+
+      box-shadow:
+        0 0 28px color-mix(in srgb, var(--accent) 25%, transparent),
+        0 0 18px color-mix(in srgb, var(--accent) 15%, transparent),
+        inset 0 0 22px color-mix(in srgb, var(--accent) 8%, transparent);
+
+      &:hover {
+        box-shadow:
+          0 0 34px color-mix(in srgb, var(--accent) 25%, transparent),
+          0 0 35px color-mix(in srgb, var(--accent) 15%, transparent),
+          inset 0 0 24px color-mix(in srgb, var(--accent) 28%, transparent);
+      }
+    }
+  }
+}
