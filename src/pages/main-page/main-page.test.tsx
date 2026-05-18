@@ -4,6 +4,14 @@ import { LOCAL_STORAGE_KEYS } from '../../constants/local-storage';
 import userEvent from '@testing-library/user-event';
 import { mockCharacters, mockCharactersResponse } from '../../test-utils/mocks/characters';
 import { MainPage } from './main-page';
+import { MemoryRouter } from 'react-router';
+
+const renderMainPage = (path = '/') =>
+  render(
+    <MemoryRouter initialEntries={[path]}>
+      <MainPage />
+    </MemoryRouter>
+  );
 
 vi.mock('../../api/ramapi-service', () => ({
   RamapiService: {
@@ -17,7 +25,7 @@ describe('MainPage', () => {
   });
 
   it('should load first page of characters on initial render', async () => {
-    render(<MainPage />);
+    renderMainPage();
 
     await waitFor(() => {
       expect(RamapiService.getCharacters).toHaveBeenCalledTimes(1);
@@ -33,7 +41,7 @@ describe('MainPage', () => {
   });
 
   it('should render characters after successful API request', async () => {
-    render(<MainPage />);
+    renderMainPage();
 
     expect(await screen.findByRole('heading', { name: mockCharacters[0].name })).toBeInTheDocument();
   });
@@ -41,7 +49,7 @@ describe('MainPage', () => {
   it('should use saved search value from localStorage on initial render', async () => {
     localStorage.setItem(LOCAL_STORAGE_KEYS.SEARCH_TERM, 'rick');
 
-    render(<MainPage />);
+    renderMainPage();
 
     expect(screen.getByRole('textbox', { name: /search characters/i })).toHaveValue('rick');
 
@@ -59,7 +67,7 @@ describe('MainPage', () => {
   it('should trim search value on submit and send request for the first page', async () => {
     const user = userEvent.setup();
 
-    render(<MainPage />);
+    renderMainPage();
 
     const input = screen.getByRole('textbox', { name: /search characters/i });
 
@@ -82,7 +90,7 @@ describe('MainPage', () => {
   it('should save search value to localStorage on search submit', async () => {
     const user = userEvent.setup();
 
-    render(<MainPage />);
+    renderMainPage();
 
     const input = screen.getByRole('textbox', { name: /search characters/i });
 
@@ -98,7 +106,7 @@ describe('MainPage', () => {
 
     localStorage.setItem(LOCAL_STORAGE_KEYS.SEARCH_TERM, 'rick');
 
-    render(<MainPage />);
+    renderMainPage();
 
     const input = screen.getByRole('textbox', { name: /search characters/i });
 
@@ -124,7 +132,7 @@ describe('MainPage', () => {
 
     localStorage.setItem(LOCAL_STORAGE_KEYS.SEARCH_TERM, 'rick');
 
-    render(<MainPage />);
+    renderMainPage();
 
     const input = screen.getByRole('textbox', { name: /search characters/i });
 
@@ -139,7 +147,7 @@ describe('MainPage', () => {
 
     localStorage.setItem(LOCAL_STORAGE_KEYS.SEARCH_TERM, 'rick');
 
-    render(<MainPage />);
+    renderMainPage();
 
     await waitFor(() => {
       expect(RamapiService.getCharacters).toHaveBeenCalledTimes(1);
@@ -161,7 +169,7 @@ describe('MainPage', () => {
       results: [],
     });
 
-    render(<MainPage />);
+    renderMainPage();
 
     expect(await screen.findByText(/No characters found/i)).toBeInTheDocument();
   });
@@ -171,10 +179,24 @@ describe('MainPage', () => {
       new Error('No characters found. Try another search term.')
     );
 
-    render(<MainPage />);
+    renderMainPage();
 
     expect(await screen.findByRole('alert')).toBeInTheDocument();
 
     expect(screen.getByText(/no characters found\. try another search term\./i)).toBeInTheDocument();
+  });
+
+  it('should show pagination after characters are loaded when there are multiple pages', async () => {
+    vi.mocked(RamapiService.getCharacters).mockResolvedValue({
+      ...mockCharactersResponse,
+      info: {
+        ...mockCharactersResponse.info,
+        pages: 3,
+      },
+    });
+
+    renderMainPage('/?page=1');
+
+    expect(await screen.findByText(/Page 1 of 3/i)).toBeInTheDocument();
   });
 });
