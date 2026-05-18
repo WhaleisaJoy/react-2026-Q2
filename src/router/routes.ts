@@ -8,4 +8,8 @@ export const APP_ROUTES = {
     path: 'about',
     to: '/about',
   },
+
+  NOT_FOUND: {
+    path: '*',
+  },
 } as const;
