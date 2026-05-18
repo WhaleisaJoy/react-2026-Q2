@@ -9,18 +9,23 @@ import { RamapiService } from '../../api/ramapi-service';
 import { Pagination } from '../../components/pagination/pagination';
 import { useSearchParams } from 'react-router';
 import { getValidPage } from '../../utils/utils';
+import { useLocalStorage } from '../../hooks/use-local-storage';
 
 export function MainPage() {
+  const {
+    value: submittedSearchValue,
+    setValue: setSubmittedSearchValue,
+    removeValue: removeSubmittedSearchValue,
+  } = useLocalStorage(LOCAL_STORAGE_KEYS.SEARCH_TERM);
+
   const [searchParams, setSearchParams] = useSearchParams();
 
   const currentPage = getValidPage(searchParams.get('page'));
   const [totalPages, setTotalPages] = useState(1);
 
   const [characters, setCharacters] = useState<Character[]>([]);
-  const [searchValue, setSearchValue] = useState(() => localStorage.getItem(LOCAL_STORAGE_KEYS.SEARCH_TERM) ?? '');
-  const [submittedSearchValue, setSubmittedSearchValue] = useState(
-    () => localStorage.getItem(LOCAL_STORAGE_KEYS.SEARCH_TERM) ?? ''
-  );
+  const [searchValue, setSearchValue] = useState(submittedSearchValue);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -96,14 +101,13 @@ export function MainPage() {
     }
 
     if (normalizedSearchValue !== '') {
-      localStorage.setItem(LOCAL_STORAGE_KEYS.SEARCH_TERM, normalizedSearchValue);
+      setSubmittedSearchValue(normalizedSearchValue);
     } else {
-      localStorage.removeItem(LOCAL_STORAGE_KEYS.SEARCH_TERM);
+      removeSubmittedSearchValue();
     }
 
     setIsLoading(true);
     setError(null);
-    setSubmittedSearchValue(normalizedSearchValue);
     updatePageInUrl(1);
   };
 
