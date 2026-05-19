@@ -16,7 +16,7 @@ export async function getCharacters(
 
   Object.entries(params).forEach(([key, value]) => {
     if (value) {
-      searchParams.set(key, String(value).trim());
+      searchParams.set(key, String(value));
     }
   });
 
