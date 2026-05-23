@@ -17,6 +17,12 @@
     text-decoration: none;
   }
 
+  &__spacer {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
   &__nav {
     display: flex;
     align-items: center;

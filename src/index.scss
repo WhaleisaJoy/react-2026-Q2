@@ -29,6 +29,18 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+[data-theme='light'] {
+  --card-bg: #f4f7f5;
+  --card-bg-light: #e0e5e5;
+
+  --text-main: #031018;
+  --text-muted: #6b6375;
+  --text-dark: #031018;
+
+  --text: #6b6375;
+  --bg: #f4f7f5;
+}
+
 *,
 *::before,
 *::after {
