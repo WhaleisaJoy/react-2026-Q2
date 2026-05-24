@@ -2,61 +2,56 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CharacterListSection } from './character-list-section';
 import { mockCharacters } from '../../test-utils/mocks/characters';
+import { Provider } from 'react-redux';
+import type { ComponentProps } from 'react';
+import { configureStore } from '@reduxjs/toolkit';
+import { charactersReducer } from '../../store/characters-reducer/characters-reducer';
+
+const renderCharacterListSection = (props: Partial<ComponentProps<typeof CharacterListSection>> = {}) => {
+  const store = configureStore({
+    reducer: {
+      characters: charactersReducer,
+    },
+  });
+
+  const view = render(
+    <Provider store={store}>
+      <CharacterListSection
+        isLoading={false}
+        error={null}
+        characters={mockCharacters}
+        selectedCharacterId={null}
+        onSelectCharacter={() => {}}
+        {...props}
+      />
+    </Provider>
+  );
+
+  return { view, store };
+};
 
 describe('CharacterListSection', () => {
   it('should render loader when loading', () => {
-    render(
-      <CharacterListSection
-        isLoading
-        error={null}
-        characters={[]}
-        selectedCharacterId={null}
-        onSelectCharacter={() => {}}
-      />
-    );
+    renderCharacterListSection({ isLoading: true, characters: [] });
 
     expect(screen.getByRole('status', { name: /loading/i })).toBeInTheDocument();
   });
 
   it('should render error message', () => {
-    render(
-      <CharacterListSection
-        isLoading={false}
-        error="Something went wrong"
-        characters={[]}
-        selectedCharacterId={null}
-        onSelectCharacter={() => {}}
-      />
-    );
+    renderCharacterListSection({ error: 'Something went wrong' });
 
     expect(screen.getByRole('alert')).toBeInTheDocument();
     expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
   });
 
   it('should render no results message when characters array is empty', () => {
-    render(
-      <CharacterListSection
-        isLoading={false}
-        error={null}
-        characters={[]}
-        selectedCharacterId={null}
-        onSelectCharacter={() => {}}
-      />
-    );
+    renderCharacterListSection({ characters: [] });
 
     expect(screen.getByText(/no characters found/i)).toBeInTheDocument();
   });
 
   it('should render correct number of character cards', () => {
-    render(
-      <CharacterListSection
-        isLoading={false}
-        error={null}
-        characters={mockCharacters}
-        selectedCharacterId={1}
-        onSelectCharacter={() => {}}
-      />
-    );
+    renderCharacterListSection({ selectedCharacterId: 1 });
 
     expect(screen.getAllByRole('article')).toHaveLength(mockCharacters.length);
   });
@@ -65,18 +60,28 @@ describe('CharacterListSection', () => {
     const user = userEvent.setup();
     const onSelectCharacter = vi.fn();
 
-    render(
-      <CharacterListSection
-        isLoading={false}
-        error={null}
-        characters={mockCharacters}
-        selectedCharacterId={null}
-        onSelectCharacter={onSelectCharacter}
-      />
-    );
+    renderCharacterListSection({ onSelectCharacter });
 
-    await user.click(screen.getByRole('button', { name: /rick sanchez/i }));
+    await user.click(screen.getAllByRole('article')[0]);
 
     expect(onSelectCharacter).toHaveBeenCalledWith(mockCharacters[0].id);
+  });
+
+  it('should toggle character selection when checkbox is clicked', async () => {
+    const user = userEvent.setup();
+
+    const { store } = renderCharacterListSection();
+
+    const checkbox = screen.getByRole('checkbox', { name: /select rick sanchez/i });
+
+    await user.click(checkbox);
+
+    expect(store.getState().characters.selectedIds).toContain(mockCharacters[0].id);
+    expect(checkbox).toBeChecked();
+
+    await user.click(checkbox);
+
+    expect(store.getState().characters.selectedIds).not.toContain(mockCharacters[0].id);
+    expect(checkbox).not.toBeChecked();
   });
 });

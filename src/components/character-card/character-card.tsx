@@ -1,20 +1,67 @@
 import type { Character } from '../../types/character';
 import './character-card.scss';
+import type { KeyboardEvent, MouseEvent } from 'react';
 
 interface Props {
   character: Character;
-  isSelected?: boolean;
-  onSelect: (id: number) => void;
+  isCardSelected?: boolean;
+  isCheckboxSelected: boolean;
+  onCardSelect: (id: number) => void;
+  onCheckboxToggle: (id: number) => void;
 }
 
-export function CharacterCard({ character, isSelected, onSelect }: Props) {
-  const handleClick = () => {
-    onSelect(character.id);
+export function CharacterCard({
+  character,
+  isCardSelected,
+  isCheckboxSelected,
+  onCardSelect,
+  onCheckboxToggle,
+}: Props) {
+  const handleCardClick = () => {
+    onCardSelect(character.id);
+  };
+
+  const handleCardKeyDown = (evt: KeyboardEvent<HTMLElement>) => {
+    if (evt.target !== evt.currentTarget) {
+      return;
+    }
+
+    if (evt.key !== 'Enter' && evt.key !== ' ') {
+      return;
+    }
+
+    evt.preventDefault();
+    handleCardClick();
+  };
+
+  const handleCheckboxClick = (evt: MouseEvent<HTMLInputElement>) => {
+    evt.stopPropagation();
+  };
+
+  const handleCheckboxChange = () => {
+    onCheckboxToggle(character.id);
   };
 
   return (
-    <article className={`character-card ${isSelected ? 'character-card--selected' : ''}`}>
-      <button className="character-card__button" type="button" onClick={handleClick}>
+    <article
+      className={`character-card ${isCardSelected ? 'character-card--selected' : ''}`}
+      tabIndex={0}
+      onClick={handleCardClick}
+      onKeyDown={handleCardKeyDown}
+    >
+      <label className="visually-hidden" htmlFor={`character-checkbox-${character.id}`}>
+        {`Select ${character.name}`}
+      </label>
+      <input
+        id={`character-checkbox-${character.id}`}
+        className="character-card__checkbox"
+        type="checkbox"
+        checked={isCheckboxSelected}
+        onClick={handleCheckboxClick}
+        onChange={handleCheckboxChange}
+      />
+
+      <div className="character-card__body">
         <figure className="character-card__image-wrapper">
           <img className="character-card__image" src={character.image} alt={character.name} loading="lazy" />
         </figure>
@@ -40,7 +87,7 @@ export function CharacterCard({ character, isSelected, onSelect }: Props) {
             </li>
           </ul>
         </div>
-      </button>
+      </div>
     </article>
   );
 }

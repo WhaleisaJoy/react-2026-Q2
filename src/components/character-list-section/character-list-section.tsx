@@ -1,3 +1,6 @@
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { toggleCharacterSelection } from '../../store/characters-reducer/characters-reducer';
+import { getSelectedIds } from '../../store/characters-reducer/selectors';
 import type { Character } from '../../types/character';
 import { CharacterCard } from '../character-card/character-card';
 import { CharacterList } from '../character-list/character-list';
@@ -11,6 +14,14 @@ interface Props {
   onSelectCharacter: (id: number) => void;
 }
 export function CharacterListSection({ isLoading, error, characters, selectedCharacterId, onSelectCharacter }: Props) {
+  const dispatch = useAppDispatch();
+
+  const selectedCharacterIds = useAppSelector(getSelectedIds);
+
+  const onSelectionToggle = (id: number) => {
+    dispatch(toggleCharacterSelection(id));
+  };
+
   if (isLoading) return <Loader />;
 
   if (error) {
@@ -29,12 +40,15 @@ export function CharacterListSection({ isLoading, error, characters, selectedCha
   return (
     <CharacterList>
       {characters.map((character) => (
-        <CharacterCard
-          key={character.id}
-          character={character}
-          isSelected={character.id === selectedCharacterId}
-          onSelect={onSelectCharacter}
-        />
+        <div key={character.id} className="character-list__item">
+          <CharacterCard
+            character={character}
+            isCardSelected={character.id === selectedCharacterId}
+            isCheckboxSelected={selectedCharacterIds.includes(character.id)}
+            onCardSelect={onSelectCharacter}
+            onCheckboxToggle={onSelectionToggle}
+          />
+        </div>
       ))}
     </CharacterList>
   );
