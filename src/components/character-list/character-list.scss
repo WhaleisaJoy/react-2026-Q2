@@ -3,6 +3,12 @@
   grid-template-columns: repeat(2, minmax(220px, 1fr));
   gap: 20px;
 
+  &__item {
+    display: flex;
+    container-type: inline-size;
+    min-width: 0;
+  }
+
   @media (max-width: 991px) {
     grid-template-columns: repeat(1, minmax(220px, 1fr));
   }

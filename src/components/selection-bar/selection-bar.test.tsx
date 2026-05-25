@@ -1,0 +1,75 @@
+import { render, screen } from '@testing-library/react';
+import { SelectionBar } from './selection-bar';
+import { configureStore } from '@reduxjs/toolkit';
+import { charactersReducer } from '../../store/characters-reducer/characters-reducer';
+import { Provider } from 'react-redux';
+import { mockCharacters } from '../../test-utils/mocks/characters';
+import userEvent from '@testing-library/user-event';
+import { exportSelectedCharactersToCsv } from '../../utils/character-export.utils';
+
+const renderSelectionBar = (selectedCharactersById = {}) => {
+  const store = configureStore({
+    reducer: {
+      characters: charactersReducer,
+    },
+    preloadedState: {
+      characters: {
+        selectedCharactersById,
+      },
+    },
+  });
+
+  render(
+    <Provider store={store}>
+      <SelectionBar />
+    </Provider>
+  );
+};
+
+vi.mock('../../utils/character-export.utils', () => ({
+  exportSelectedCharactersToCsv: vi.fn(),
+}));
+
+describe('SectionBar', () => {
+  it('should not render when no characters are selected', () => {
+    renderSelectionBar();
+
+    expect(screen.queryByRole('button', { name: /unselect all/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /download/i })).not.toBeInTheDocument();
+  });
+
+  it('should render when at least one character is selected', () => {
+    renderSelectionBar({
+      [mockCharacters[0].id]: mockCharacters[0],
+    });
+
+    expect(screen.getByRole('button', { name: /unselect all/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /download/i })).toBeInTheDocument();
+  });
+
+  it('should hide component when Unselect all is clicked', async () => {
+    const user = userEvent.setup();
+
+    renderSelectionBar({
+      [mockCharacters[0].id]: mockCharacters[0],
+    });
+
+    expect(screen.getByText('1 items selected')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /unselect all/i }));
+
+    expect(screen.queryByRole('button', { name: /unselect all/i })).not.toBeInTheDocument();
+  });
+
+  it('should call exportSelectedCharactersToCsv when Download is clicked', async () => {
+    const user = userEvent.setup();
+
+    renderSelectionBar({
+      [mockCharacters[0].id]: mockCharacters[0],
+    });
+
+    await user.click(screen.getByRole('button', { name: /download/i }));
+    expect(vi.mocked(exportSelectedCharactersToCsv)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(exportSelectedCharactersToCsv)).toHaveBeenCalledWith([mockCharacters[0]]);
+  });
+});

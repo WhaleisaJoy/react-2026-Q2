@@ -3,11 +3,14 @@ import { screen } from '@testing-library/react';
 import { Header } from './header';
 import { MemoryRouter } from 'react-router';
 import { APP_ROUTES } from '../../router/routes';
+import { ThemeProvider } from '../../context/theme-provider';
 
 const renderHeader = (path = '/') => {
   render(
     <MemoryRouter initialEntries={[path]}>
-      <Header />
+      <ThemeProvider>
+        <Header />
+      </ThemeProvider>
     </MemoryRouter>
   );
 };

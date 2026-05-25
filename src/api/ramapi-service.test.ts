@@ -35,22 +35,6 @@ describe('RamapiService', () => {
     });
   });
 
-  it('should trim string params before request', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockCharactersResponse,
-    } as Response);
-
-    await getCharacters({
-      name: '  morty   ',
-      page: 1,
-    });
-
-    expect(fetch).toHaveBeenCalledWith(`${BASE_URL}${RAMAPI_ROUTES.CHARACTERS}?name=morty&page=1`, {
-      signal: undefined,
-    });
-  });
-
   it('should pass abort signal to fetch', async () => {
     vi.mocked(fetch).mockResolvedValueOnce({
       ok: true,

@@ -1,16 +1,20 @@
 import { render, screen } from '@testing-library/react';
 import { CharacterList } from './character-list';
-import { mockCharacters } from '../../test-utils/mocks/characters';
 
 describe('CharacterList', () => {
-  it('should render correct number of character cards', () => {
-    render(<CharacterList characters={mockCharacters} selectedCharacterId={1} onSelectCharacter={() => {}} />);
+  it('should render children', () => {
+    render(
+      <CharacterList>
+        <article>Character card</article>
+        <article>Another character card</article>
+      </CharacterList>
+    );
 
-    expect(screen.getAllByRole('article')).toHaveLength(mockCharacters.length);
+    expect(screen.getAllByRole('article')).toHaveLength(2);
   });
 
-  it('should render no character cards when character array is empty', () => {
-    render(<CharacterList characters={[]} selectedCharacterId={1} onSelectCharacter={() => {}} />);
+  it('should render empty list when there are no children', () => {
+    render(<CharacterList />);
 
     expect(screen.queryAllByRole('article')).toHaveLength(0);
   });

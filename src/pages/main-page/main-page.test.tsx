@@ -5,13 +5,25 @@ import userEvent from '@testing-library/user-event';
 import { mockCharacters, mockCharactersResponse } from '../../test-utils/mocks/characters';
 import { MainPage } from './main-page';
 import { MemoryRouter } from 'react-router';
+import { configureStore } from '@reduxjs/toolkit';
+import { charactersReducer } from '../../store/characters-reducer/characters-reducer';
+import { Provider } from 'react-redux';
 
-const renderMainPage = (path = '/') =>
+const renderMainPage = (path = '/') => {
+  const store = configureStore({
+    reducer: {
+      characters: charactersReducer,
+    },
+  });
+
   render(
-    <MemoryRouter initialEntries={[path]}>
-      <MainPage />
-    </MemoryRouter>
+    <Provider store={store}>
+      <MemoryRouter initialEntries={[path]}>
+        <MainPage />
+      </MemoryRouter>
+    </Provider>
   );
+};
 
 vi.mock('../../api/ramapi-service', () => ({
   getCharacters: vi.fn(),

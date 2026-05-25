@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import './error-boundry.scss';
+import './error-boundary.scss';
 import { Button } from '../shared/button/button';
 
 interface State {
@@ -26,9 +26,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   handleReload = () => {
-    this.setState((prev) => ({
-      hasError: !prev.hasError,
-    }));
+    this.setState({ hasError: false });
   };
 
   render() {
