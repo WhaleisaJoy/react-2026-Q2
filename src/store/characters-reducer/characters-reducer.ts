@@ -20,8 +20,12 @@ const charactersSlice = createSlice({
 
       state.selectedIds.push(id);
     },
+
+    clearSelectedIds: (state) => {
+      state.selectedIds = [];
+    },
   },
 });
 
-export const { toggleCharacterSelection } = charactersSlice.actions;
+export const { toggleCharacterSelection, clearSelectedIds } = charactersSlice.actions;
 export const charactersReducer = charactersSlice.reducer;

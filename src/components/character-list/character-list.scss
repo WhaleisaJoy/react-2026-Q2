@@ -4,6 +4,7 @@
   gap: 20px;
 
   &__item {
+    display: flex;
     container-type: inline-size;
     min-width: 0;
   }

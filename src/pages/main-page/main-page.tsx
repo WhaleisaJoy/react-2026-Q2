@@ -5,6 +5,7 @@ import { Pagination } from '../../components/pagination/pagination';
 import { Outlet } from 'react-router';
 import { CharacterListSection } from '../../components/character-list-section/character-list-section';
 import { useMainPage } from '../../hooks/use-main-page';
+import { SelectionBar } from '../../components/selection-bar/selection-bar';
 
 export function MainPage() {
   const {
@@ -50,6 +51,8 @@ export function MainPage() {
           <Outlet context={{ selectedCharacterId, onClose: closeDetails }} />
         </aside>
       )}
+
+      <SelectionBar />
     </div>
   );
 }
