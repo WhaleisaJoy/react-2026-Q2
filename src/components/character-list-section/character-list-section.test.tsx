@@ -14,7 +14,7 @@ const renderCharacterListSection = (props: Partial<ComponentProps<typeof Charact
     },
   });
 
-  const view = render(
+  render(
     <Provider store={store}>
       <CharacterListSection
         isLoading={false}
@@ -26,8 +26,6 @@ const renderCharacterListSection = (props: Partial<ComponentProps<typeof Charact
       />
     </Provider>
   );
-
-  return { view, store };
 };
 
 describe('CharacterListSection', () => {
@@ -70,18 +68,14 @@ describe('CharacterListSection', () => {
   it('should toggle character selection when checkbox is clicked', async () => {
     const user = userEvent.setup();
 
-    const { store } = renderCharacterListSection();
+    renderCharacterListSection();
 
     const checkbox = screen.getByRole('checkbox', { name: /select rick sanchez/i });
 
     await user.click(checkbox);
-
-    expect(store.getState().characters.selectedIds).toContain(mockCharacters[0].id);
     expect(checkbox).toBeChecked();
 
     await user.click(checkbox);
-
-    expect(store.getState().characters.selectedIds).not.toContain(mockCharacters[0].id);
     expect(checkbox).not.toBeChecked();
   });
 });

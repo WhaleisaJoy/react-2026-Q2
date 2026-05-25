@@ -7,7 +7,7 @@ interface Props {
   isCardSelected?: boolean;
   isCheckboxSelected: boolean;
   onCardSelect: (id: number) => void;
-  onCheckboxToggle: (id: number) => void;
+  onCheckboxToggle: (character: Character) => void;
 }
 
 export function CharacterCard({
@@ -39,7 +39,7 @@ export function CharacterCard({
   };
 
   const handleCheckboxChange = () => {
-    onCheckboxToggle(character.id);
+    onCheckboxToggle(character);
   };
 
   return (

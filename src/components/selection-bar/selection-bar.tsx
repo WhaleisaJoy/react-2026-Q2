@@ -1,29 +1,35 @@
 import './selection-bar.scss';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getSelectedIdsCount } from '../../store/characters-reducer/selectors';
+import { getSelectedCharacters, getSelectedCharactersCount } from '../../store/characters-reducer/selectors';
 import { Button } from '../shared/button/button';
-import { clearSelectedIds } from '../../store/characters-reducer/characters-reducer';
+import { clearSelectedCharacters } from '../../store/characters-reducer/characters-reducer';
+import { exportSelectedCharactersToCsv } from '../../utils/character-export.utils';
 
 export function SelectionBar() {
   const dispatch = useAppDispatch();
-  const selectedIdsCount = useAppSelector(getSelectedIdsCount);
+  const selectedCharacters = useAppSelector(getSelectedCharacters);
+  const selectedCharactersCount = useAppSelector(getSelectedCharactersCount);
 
-  if (selectedIdsCount === 0) return null;
+  if (selectedCharactersCount === 0) return null;
 
   const handleUnselectAll = () => {
-    dispatch(clearSelectedIds());
+    dispatch(clearSelectedCharacters());
+  };
+
+  const handleDownload = () => {
+    exportSelectedCharactersToCsv(selectedCharacters);
   };
 
   return (
     <div className="selection-bar">
       <div className="selection-bar__info">
         <span className="selection-bar__icon"></span>
-        <span>{selectedIdsCount} items selected</span>
+        <span>{selectedCharactersCount} items selected</span>
       </div>
 
       <div className="selection-bar__actions">
         <Button onClick={handleUnselectAll}>Unselect all</Button>
-        <Button>Download</Button>
+        <Button onClick={handleDownload}>Download</Button>
       </div>
     </div>
   );

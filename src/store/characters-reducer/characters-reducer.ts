@@ -1,31 +1,32 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { CharactersState } from '../../types/state';
+import type { Character } from '../../types/character';
 
 const initialState: CharactersState = {
-  selectedIds: [],
+  selectedCharactersById: {},
 };
 
 const charactersSlice = createSlice({
   name: 'characters',
   initialState,
   reducers: {
-    toggleCharacterSelection: (state, action: PayloadAction<number>) => {
-      const id = action.payload;
-      const isSelected = state.selectedIds.includes(id);
+    toggleCharacterSelection: (state, action: PayloadAction<Character>) => {
+      const character = action.payload;
+      const isSelected = Boolean(state.selectedCharactersById[character.id]);
 
       if (isSelected) {
-        state.selectedIds = state.selectedIds.filter((selectedId) => selectedId !== id);
+        delete state.selectedCharactersById[character.id];
         return;
       }
 
-      state.selectedIds.push(id);
+      state.selectedCharactersById[character.id] = character;
     },
 
-    clearSelectedIds: (state) => {
-      state.selectedIds = [];
+    clearSelectedCharacters: (state) => {
+      state.selectedCharactersById = {};
     },
   },
 });
 
-export const { toggleCharacterSelection, clearSelectedIds } = charactersSlice.actions;
+export const { toggleCharacterSelection, clearSelectedCharacters } = charactersSlice.actions;
 export const charactersReducer = charactersSlice.reducer;

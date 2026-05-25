@@ -83,7 +83,27 @@ describe('CharacterCard', () => {
     await user.click(screen.getByRole('checkbox', { name: `Select ${mockCharacter.name}` }));
 
     expect(onCheckboxToggle).toHaveBeenCalledTimes(1);
-    expect(onCheckboxToggle).toHaveBeenCalledWith(mockCharacter.id);
+    expect(onCheckboxToggle).toHaveBeenCalledWith(mockCharacter);
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('should not call onSelect when unsupported key is pressed on card', async () => {
+    const user = userEvent.setup();
+    renderCharacterCard();
+
+    screen.getByRole('article').focus();
+    await user.keyboard('a');
+
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('should not call onSelect when keydown comes from checkbox', async () => {
+    const user = userEvent.setup();
+    renderCharacterCard();
+
+    screen.getByRole('checkbox', { name: `Select ${mockCharacter.name}` }).focus();
+    await user.keyboard('{Enter}');
+
     expect(onSelect).not.toHaveBeenCalled();
   });
 });

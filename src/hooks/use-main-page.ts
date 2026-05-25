@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { LOCAL_STORAGE_KEYS } from '../constants/local-storage';
 import type { Character } from '../types/character';
-import { getValidDetailsId, getValidPage } from '../utils/utils';
+import { getValidDetailsId, getValidPage } from '../utils/url-params.utils';
 import { useLocalStorage } from './use-local-storage';
 import { useUrlParams } from './use-url-params';
 import { getCharacters } from '../api/ramapi-service';
@@ -132,7 +132,6 @@ export function useMainPage(): UseMainPageResult {
     setError(null);
     updateUrlParams({
       page,
-      details: null,
     });
   };
 
