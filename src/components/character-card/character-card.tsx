@@ -44,6 +44,7 @@ export function CharacterCard({
 
   return (
     <article
+      role="button"
       className={`character-card ${isCardSelected ? 'character-card--selected' : ''}`}
       tabIndex={0}
       onClick={handleCardClick}

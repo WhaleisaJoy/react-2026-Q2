@@ -4,6 +4,8 @@ import { getCharacter } from '../../api/ramapi-service';
 import { useEffect, useState } from 'react';
 import type { Character } from '../../types/character';
 import { Loader } from '../shared/loader/loader';
+import { isAbortError } from '../../utils/errors.utils';
+import { ErrorMessage } from '../shared/error-message/error-message';
 
 interface Context {
   selectedCharacterId: number;
@@ -29,7 +31,7 @@ export function CharacterDetails() {
 
         setCharacter(data);
       } catch (error) {
-        if (error instanceof DOMException && error.name === 'AbortError') {
+        if (isAbortError(error)) {
           return;
         }
 
@@ -57,12 +59,7 @@ export function CharacterDetails() {
 
       {isLoading && <Loader />}
 
-      {!isLoading && error && (
-        <div className="app-error" role="alert">
-          <h3 className="app-error__title">Oops!</h3>
-          <p>{error}</p>
-        </div>
-      )}
+      {!isLoading && error && <ErrorMessage message={error} />}
 
       {!isLoading && character && (
         <div className="character-details__content">

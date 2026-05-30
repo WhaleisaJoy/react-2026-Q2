@@ -59,7 +59,7 @@ describe('CharacterCard', () => {
     const user = userEvent.setup();
     renderCharacterCard();
 
-    await user.click(screen.getByRole('article'));
+    await user.click(screen.getByRole('button'));
 
     expect(onSelect).toHaveBeenCalledTimes(1);
     expect(onSelect).toHaveBeenCalledWith(mockCharacter.id);
@@ -69,7 +69,7 @@ describe('CharacterCard', () => {
     const user = userEvent.setup();
     renderCharacterCard();
 
-    screen.getByRole('article').focus();
+    screen.getByRole('button').focus();
     await user.keyboard('{Enter}');
 
     expect(onSelect).toHaveBeenCalledTimes(1);
@@ -91,7 +91,7 @@ describe('CharacterCard', () => {
     const user = userEvent.setup();
     renderCharacterCard();
 
-    screen.getByRole('article').focus();
+    screen.getByRole('button').focus();
     await user.keyboard('a');
 
     expect(onSelect).not.toHaveBeenCalled();
