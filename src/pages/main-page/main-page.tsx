@@ -11,7 +11,7 @@ export function MainPage() {
   const {
     characters,
     isLoading,
-    error,
+    errorMessage,
     currentPage,
     totalPages,
     searchValue,
@@ -35,7 +35,7 @@ export function MainPage() {
 
         <CharacterListSection
           isLoading={isLoading}
-          error={error}
+          error={errorMessage}
           characters={characters}
           selectedCharacterId={selectedCharacterId}
           onSelectCharacter={openDetails}

@@ -1,11 +1,9 @@
 import './character-details.scss';
 import { useOutletContext } from 'react-router';
-import { getCharacter } from '../../api/ramapi-service';
-import { useEffect, useState } from 'react';
-import type { Character } from '../../types/character';
+import { useGetCharacterQuery } from '../../api/ramapi-service';
 import { Loader } from '../shared/loader/loader';
-import { isAbortError } from '../../utils/errors.utils';
 import { ErrorMessage } from '../shared/error-message/error-message';
+import { getDetailsErrorMessage } from '../../api/error-messages';
 
 interface Context {
   selectedCharacterId: number;
@@ -15,41 +13,8 @@ interface Context {
 export function CharacterDetails() {
   const { selectedCharacterId, onClose } = useOutletContext<Context>();
 
-  const [character, setCharacter] = useState<Character | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const abortController = new AbortController();
-
-    const loadDetails = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const data = await getCharacter(selectedCharacterId, abortController.signal);
-
-        setCharacter(data);
-      } catch (error) {
-        if (isAbortError(error)) {
-          return;
-        }
-
-        setCharacter(null);
-        setError(error instanceof Error ? error.message : 'Something went wrong while loading details.');
-      } finally {
-        if (!abortController.signal.aborted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    loadDetails();
-
-    return () => {
-      abortController.abort();
-    };
-  }, [selectedCharacterId]);
+  const { data: character, isLoading, error } = useGetCharacterQuery(selectedCharacterId);
+  const errorMessage = error ? getDetailsErrorMessage(error) : null;
 
   return (
     <div className="character-details">
@@ -59,7 +24,7 @@ export function CharacterDetails() {
 
       {isLoading && <Loader />}
 
-      {!isLoading && error && <ErrorMessage message={error} />}
+      {!isLoading && errorMessage && <ErrorMessage message={errorMessage} />}
 
       {!isLoading && character && (
         <div className="character-details__content">

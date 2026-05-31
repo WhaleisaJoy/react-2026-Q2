@@ -2,13 +2,14 @@ import { useEffect } from 'react';
 import type { Character } from '../types/character';
 import { getValidDetailsId, getValidPage } from '../utils/url-params.utils';
 import { useUrlParams } from './use-url-params';
-import { useCharactersData } from './use-characters-data';
 import { useCharacterSearch } from './use-character-search';
+import { useGetCharactersQuery } from '../api/ramapi-service';
+import { getCharactersErrorMessage } from '../api/error-messages';
 
 interface UseMainPageResult {
   characters: Character[];
   isLoading: boolean;
-  error: string | null;
+  errorMessage: string | null;
   currentPage: number;
   totalPages: number;
   searchValue: string;
@@ -49,7 +50,14 @@ export function useMainPage(): UseMainPageResult {
     });
   });
 
-  const { characters, totalPages, isLoading, error } = useCharactersData(submittedSearchValue, currentPage);
+  const { data, isLoading, error } = useGetCharactersQuery({
+    name: submittedSearchValue.trim(),
+    page: currentPage,
+  });
+
+  const characters = data?.results ?? [];
+  const totalPages = data?.info.pages ?? 1;
+  const errorMessage = error ? getCharactersErrorMessage(error) : null;
 
   const handlePageChange = (page: number) => {
     if (page === currentPage) {
@@ -73,12 +81,12 @@ export function useMainPage(): UseMainPageResult {
     });
   };
 
-  const shouldShowPagination = !isLoading && !error && characters.length > 0 && totalPages > 1;
+  const shouldShowPagination = !isLoading && !errorMessage && characters.length > 0 && totalPages > 1;
 
   return {
     characters,
     isLoading,
-    error,
+    errorMessage,
     currentPage,
     totalPages,
     searchValue,
