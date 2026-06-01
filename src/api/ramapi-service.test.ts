@@ -1,148 +1,105 @@
+import { configureStore } from '@reduxjs/toolkit';
+import { ramApi } from './ramapi-service';
 import { mockCharacters, mockCharactersResponse } from '../test-utils/mocks/characters';
-import { RAMAPI_ROUTES } from './ramapi-routes';
-import { BASE_URL, getCharacter, getCharacters } from './ramapi-service';
 
-describe('RamapiService', () => {
+const createStore = () =>
+  configureStore({
+    reducer: {
+      [ramApi.reducerPath]: ramApi.reducer,
+    },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(ramApi.middleware),
+  });
+
+describe('ramApi', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn());
   });
 
-  it('should fetch characters without query params', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockCharactersResponse,
-    } as Response);
-
-    const result = await getCharacters();
-
-    expect(fetch).toHaveBeenCalledWith(`${BASE_URL}${RAMAPI_ROUTES.CHARACTERS}`, { signal: undefined });
-    expect(result).toEqual(mockCharactersResponse);
-  });
-
-  it('should fetch characters with query params', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockCharactersResponse,
-    } as Response);
-
-    await getCharacters({
-      name: 'rick',
-      page: 1,
-    });
-
-    expect(fetch).toHaveBeenCalledWith(`${BASE_URL}${RAMAPI_ROUTES.CHARACTERS}?name=rick&page=1`, {
-      signal: undefined,
-    });
-  });
-
-  it('should pass abort signal to fetch', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockCharactersResponse,
-    } as Response);
-
-    const abortController = new AbortController();
-
-    await getCharacters(
-      {
-        name: 'rick',
-        page: 1,
-      },
-      abortController.signal
+  it('should fetch characters', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(JSON.stringify(mockCharactersResponse), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
     );
 
-    expect(fetch).toHaveBeenCalledWith(`${BASE_URL}${RAMAPI_ROUTES.CHARACTERS}?name=rick&page=1`, {
-      signal: abortController.signal,
+    const store = createStore();
+
+    const result = await store.dispatch(
+      ramApi.endpoints.getCharacters.initiate({
+        name: 'rick',
+        page: 1,
+      })
+    );
+
+    expect(result.data).toEqual(mockCharactersResponse);
+    expect(fetch).toHaveBeenCalled();
+  });
+
+  it('should return error for 404 response', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(JSON.stringify({ error: 'Not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    const store = createStore();
+
+    const result = await store.dispatch(
+      ramApi.endpoints.getCharacters.initiate({
+        name: 'unknown',
+        page: 1,
+      })
+    );
+
+    expect(result.error).toMatchObject({
+      status: 404,
     });
   });
 
-  it('should throw meaningful error for 404 response', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: false,
-      status: 404,
-    } as Response);
-
-    await expect(
-      getCharacters({
-        name: 'unknown character',
-        page: 1,
-      })
-    ).rejects.toThrow('No characters found. Try another search term.');
-  });
-
-  it('should throw meaningful error for 4xx response', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: false,
-      status: 400,
-    } as Response);
-
-    await expect(
-      getCharacters({
-        name: 'rick',
-        page: 1,
-      })
-    ).rejects.toThrow('The request was incorrect. Please check your search and try again.');
-  });
-
-  it('should throw meaningful error for 5xx response', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-    } as Response);
-
-    await expect(
-      getCharacters({
-        name: 'rick',
-        page: 1,
-      })
-    ).rejects.toThrow('Something went wrong on the server. Please try again later.');
-  });
-
-  it('should throw fallback error for unexpected non ok response', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: false,
-      status: 300,
-    } as Response);
-
-    await expect(
-      getCharacters({
-        name: 'rick',
-        page: 1,
-      })
-    ).rejects.toThrow('Something went wrong. Please try again later.');
-  });
-
-  it('should fetch character by id', async () => {
+  it('should reuse cached character details for the same id', async () => {
     const mockCharacter = mockCharacters[0];
 
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockCharacter,
-    } as Response);
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify(mockCharacter), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
 
-    const result = await getCharacter(mockCharacter.id);
+    const store = createStore();
 
-    expect(fetch).toHaveBeenCalledWith(`${BASE_URL}${RAMAPI_ROUTES.CHARACTERS}/${mockCharacter.id}`, {
-      signal: undefined,
-    });
-    expect(result).toEqual(mockCharacter);
+    const firstResult = await store.dispatch(ramApi.endpoints.getCharacter.initiate(mockCharacter.id));
+
+    const secondResult = await store.dispatch(ramApi.endpoints.getCharacter.initiate(mockCharacter.id));
+
+    expect(firstResult.data).toEqual(mockCharacter);
+    expect(secondResult.data).toEqual(mockCharacter);
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 
-  it('should throw meaningful details error for 404 response', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: false,
-      status: 404,
-    } as Response);
+  it('should reuse cached characters for the same query args', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify(mockCharactersResponse), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
 
-    await expect(getCharacter(999)).rejects.toThrow('Character details were not found.');
-  });
+    const store = createStore();
 
-  it('should throw meaningful details error for 4xx response', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: false,
-      status: 400,
-    } as Response);
+    const queryArgs = {
+      name: 'rick',
+      page: 1,
+    };
 
-    await expect(getCharacter(1)).rejects.toThrow('Unable to load character details. Please try another character.');
+    const firstResult = await store.dispatch(ramApi.endpoints.getCharacters.initiate(queryArgs));
+
+    const secondResult = await store.dispatch(ramApi.endpoints.getCharacters.initiate(queryArgs));
+
+    expect(firstResult.data).toEqual(mockCharactersResponse);
+    expect(secondResult.data).toEqual(mockCharactersResponse);
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 });

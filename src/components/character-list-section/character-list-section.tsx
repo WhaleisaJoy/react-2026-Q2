@@ -4,6 +4,7 @@ import { getSelectedCharacterIds } from '../../store/characters-reducer/selector
 import type { Character } from '../../types/character';
 import { CharacterCard } from '../character-card/character-card';
 import { CharacterList } from '../character-list/character-list';
+import { ErrorMessage } from '../shared/error-message/error-message';
 import { Loader } from '../shared/loader/loader';
 
 interface Props {
@@ -25,12 +26,7 @@ export function CharacterListSection({ isLoading, error, characters, selectedCha
   if (isLoading) return <Loader />;
 
   if (error) {
-    return (
-      <div className="app-error" role="alert">
-        <h3 className="app-error__title">Oops!</h3>
-        <p>{error}</p>
-      </div>
-    );
+    return <ErrorMessage message={error} />;
   }
 
   if (characters.length === 0) {

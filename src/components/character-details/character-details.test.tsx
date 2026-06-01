@@ -1,12 +1,12 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useOutletContext } from 'react-router';
-import { getCharacter } from '../../api/ramapi-service';
+import { useGetCharacterQuery } from '../../api/ramapi-service';
 import { mockCharacters } from '../../test-utils/mocks/characters';
 import { CharacterDetails } from './character-details';
 
 vi.mock('../../api/ramapi-service', () => ({
-  getCharacter: vi.fn(),
+  useGetCharacterQuery: vi.fn(),
 }));
 
 vi.mock('react-router', async () => {
@@ -28,41 +28,50 @@ describe('CharacterDetails', () => {
       onClose,
     });
 
-    vi.mocked(getCharacter).mockResolvedValue(mockCharacter);
+    vi.mocked(useGetCharacterQuery).mockReturnValue({
+      data: mockCharacter,
+      isLoading: false,
+      error: undefined,
+      refetch: vi.fn(),
+    } as ReturnType<typeof useGetCharacterQuery>);
   });
 
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('should request character details by selected id', async () => {
+  it('should request character details by selected id', () => {
     render(<CharacterDetails />);
 
-    await waitFor(() => {
-      expect(getCharacter).toHaveBeenCalledWith(mockCharacter.id, expect.any(AbortSignal));
-    });
+    expect(useGetCharacterQuery).toHaveBeenCalledWith(mockCharacter.id);
   });
 
   it('should show loader while details are loading', () => {
-    vi.mocked(getCharacter).mockReturnValue(new Promise(() => {}));
+    vi.mocked(useGetCharacterQuery).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      error: undefined,
+      refetch: vi.fn(),
+    } as ReturnType<typeof useGetCharacterQuery>);
 
     render(<CharacterDetails />);
 
     expect(screen.getByRole('status', { name: /loading/i })).toBeInTheDocument();
   });
 
-  it('should render character details after successful request', async () => {
+  it('should render character details after successful request', () => {
     render(<CharacterDetails />);
 
-    expect(await screen.findByRole('heading', { name: mockCharacter.name })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: mockCharacter.name })).toBeInTheDocument();
   });
 
-  it('should show error message when request fails', async () => {
-    vi.mocked(getCharacter).mockRejectedValueOnce(new Error('Character details were not found.'));
+  it('should show error message when request fails', () => {
+    vi.mocked(useGetCharacterQuery).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: { status: 404, data: { error: 'Not found' } },
+      refetch: vi.fn(),
+    } as ReturnType<typeof useGetCharacterQuery>);
 
     render(<CharacterDetails />);
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Character details were not found.');
+    expect(screen.getByRole('alert')).toHaveTextContent('Character details were not found.');
   });
 
   it('should call onClose when close button is clicked', async () => {
@@ -73,5 +82,19 @@ describe('CharacterDetails', () => {
     await user.click(screen.getByRole('button', { name: /close details/i }));
 
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('should show refresh indicator while details are refetching', () => {
+    vi.mocked(useGetCharacterQuery).mockReturnValue({
+      data: mockCharacter,
+      isLoading: false,
+      isFetching: true,
+      error: undefined,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useGetCharacterQuery>);
+
+    render(<CharacterDetails />);
+
+    expect(screen.getByRole('status', { name: /loading/i })).toBeInTheDocument();
   });
 });

@@ -51,7 +51,7 @@ describe('CharacterListSection', () => {
   it('should render correct number of character cards', () => {
     renderCharacterListSection({ selectedCharacterId: 1 });
 
-    expect(screen.getAllByRole('article')).toHaveLength(mockCharacters.length);
+    expect(screen.getAllByRole('button')).toHaveLength(mockCharacters.length);
   });
 
   it('should call onSelectCharacter when character card is clicked', async () => {
@@ -60,7 +60,7 @@ describe('CharacterListSection', () => {
 
     renderCharacterListSection({ onSelectCharacter });
 
-    await user.click(screen.getAllByRole('article')[0]);
+    await user.click(screen.getAllByRole('button')[0]);
 
     expect(onSelectCharacter).toHaveBeenCalledWith(mockCharacters[0].id);
   });

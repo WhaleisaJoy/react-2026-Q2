@@ -1,5 +1,4 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { getCharacters } from '../../api/ramapi-service';
 import { LOCAL_STORAGE_KEYS } from '../../constants/local-storage';
 import userEvent from '@testing-library/user-event';
 import { mockCharacters, mockCharactersResponse } from '../../test-utils/mocks/characters';
@@ -8,12 +7,15 @@ import { MemoryRouter } from 'react-router';
 import { configureStore } from '@reduxjs/toolkit';
 import { charactersReducer } from '../../store/characters-reducer/characters-reducer';
 import { Provider } from 'react-redux';
+import { ramApi } from '../../api/ramapi-service';
 
 const renderMainPage = (path = '/') => {
   const store = configureStore({
     reducer: {
       characters: charactersReducer,
+      [ramApi.reducerPath]: ramApi.reducer,
     },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(ramApi.middleware),
   });
 
   render(
@@ -25,29 +27,32 @@ const renderMainPage = (path = '/') => {
   );
 };
 
-vi.mock('../../api/ramapi-service', () => ({
-  getCharacters: vi.fn(),
-}));
+const createJsonResponse = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+const getFetchUrl = (callIndex = 0) => {
+  const input = vi.mocked(fetch).mock.calls[callIndex][0];
+
+  return input instanceof Request ? input.url : String(input);
+};
 
 describe('MainPage', () => {
   beforeEach(() => {
-    vi.mocked(getCharacters).mockResolvedValue(mockCharactersResponse);
+    vi.stubGlobal('fetch', vi.fn());
+    vi.mocked(fetch).mockResolvedValue(createJsonResponse(mockCharactersResponse));
   });
 
   it('should load first page of characters on initial render', async () => {
     renderMainPage();
 
     await waitFor(() => {
-      expect(getCharacters).toHaveBeenCalledTimes(1);
+      expect(fetch).toHaveBeenCalledTimes(1);
     });
 
-    expect(getCharacters).toHaveBeenCalledWith(
-      {
-        name: '',
-        page: 1,
-      },
-      expect.any(AbortSignal)
-    );
+    expect(getFetchUrl()).toContain('/character?name=&page=1');
   });
 
   it('should render characters after successful API request', async () => {
@@ -64,13 +69,7 @@ describe('MainPage', () => {
     expect(screen.getByRole('textbox', { name: /search characters/i })).toHaveValue('rick');
 
     await waitFor(() => {
-      expect(getCharacters).toHaveBeenCalledWith(
-        {
-          name: 'rick',
-          page: 1,
-        },
-        expect.any(AbortSignal)
-      );
+      expect(getFetchUrl()).toContain('/character?name=rick&page=1');
     });
   });
 
@@ -87,13 +86,7 @@ describe('MainPage', () => {
 
     expect(input).toHaveValue('morty');
     await waitFor(() => {
-      expect(getCharacters).toHaveBeenCalledWith(
-        {
-          name: 'morty',
-          page: 1,
-        },
-        expect.any(AbortSignal)
-      );
+      expect(getFetchUrl(1)).toContain('/character?name=morty&page=1');
     });
   });
 
@@ -127,13 +120,7 @@ describe('MainPage', () => {
     expect(localStorage.getItem(LOCAL_STORAGE_KEYS.SEARCH_TERM)).toBe('morty');
 
     await waitFor(() => {
-      expect(getCharacters).toHaveBeenCalledWith(
-        {
-          name: 'morty',
-          page: 1,
-        },
-        expect.any(AbortSignal)
-      );
+      expect(getFetchUrl(1)).toContain('/character?name=morty&page=1');
     });
   });
 
@@ -160,24 +147,26 @@ describe('MainPage', () => {
     renderMainPage();
 
     await waitFor(() => {
-      expect(getCharacters).toHaveBeenCalledTimes(1);
+      expect(fetch).toHaveBeenCalledTimes(1);
     });
 
     await user.click(screen.getByRole('button', { name: /search/i }));
 
-    expect(getCharacters).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 
   it('should show no results message when API return empty results', async () => {
-    vi.mocked(getCharacters).mockResolvedValueOnce({
-      info: {
-        count: 0,
-        pages: 0,
-        next: null,
-        prev: null,
-      },
-      results: [],
-    });
+    vi.mocked(fetch).mockResolvedValueOnce(
+      createJsonResponse({
+        info: {
+          count: 0,
+          pages: 0,
+          next: null,
+          prev: null,
+        },
+        results: [],
+      })
+    );
 
     renderMainPage();
 
@@ -185,7 +174,7 @@ describe('MainPage', () => {
   });
 
   it('shows meaningful error message when API request fails', async () => {
-    vi.mocked(getCharacters).mockRejectedValueOnce(new Error('No characters found. Try another search term.'));
+    vi.mocked(fetch).mockResolvedValueOnce(createJsonResponse({ error: 'Not found' }, 404));
 
     renderMainPage();
 
@@ -195,16 +184,98 @@ describe('MainPage', () => {
   });
 
   it('should show pagination after characters are loaded when there are multiple pages', async () => {
-    vi.mocked(getCharacters).mockResolvedValue({
-      ...mockCharactersResponse,
-      info: {
-        ...mockCharactersResponse.info,
-        pages: 3,
-      },
-    });
+    vi.mocked(fetch).mockResolvedValueOnce(
+      createJsonResponse({
+        ...mockCharactersResponse,
+        info: {
+          ...mockCharactersResponse.info,
+          pages: 3,
+        },
+      })
+    );
 
     renderMainPage('/?page=1');
 
     expect(await screen.findByText(/Page 1 of 3/i)).toBeInTheDocument();
+  });
+
+  it('should refetch characters when refresh button is clicked', async () => {
+    const user = userEvent.setup();
+
+    renderMainPage();
+
+    expect(await screen.findByRole('heading', { name: mockCharacters[0].name })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /refresh/i }));
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  it('should show loader while characters are loading', () => {
+    vi.mocked(fetch).mockReturnValueOnce(new Promise(() => {}) as Promise<Response>);
+
+    renderMainPage();
+
+    expect(screen.getByRole('status', { name: /loading/i })).toBeInTheDocument();
+  });
+
+  it('should reuse cached characters when returning to a previously loaded page', async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(
+        createJsonResponse({
+          ...mockCharactersResponse,
+          info: {
+            ...mockCharactersResponse.info,
+            pages: 2,
+          },
+        })
+      )
+      .mockResolvedValueOnce(
+        createJsonResponse({
+          ...mockCharactersResponse,
+          info: {
+            ...mockCharactersResponse.info,
+            pages: 2,
+          },
+        })
+      );
+
+    renderMainPage('/?page=1');
+
+    expect(await screen.findByRole('heading', { name: mockCharacters[0].name })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '>' }));
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledTimes(2);
+    });
+
+    await user.click(screen.getByRole('button', { name: '<' }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Page 1 of 2/i)).toBeInTheDocument();
+    });
+
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('should show list refresh indicator while characters are refetching', async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(createJsonResponse(mockCharactersResponse))
+      .mockReturnValueOnce(new Promise(() => {}) as Promise<Response>);
+
+    renderMainPage();
+
+    expect(await screen.findByRole('heading', { name: mockCharacters[0].name })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /refresh/i }));
+
+    expect(await screen.findByLabelText(/refreshing characters/i)).toBeInTheDocument();
   });
 });

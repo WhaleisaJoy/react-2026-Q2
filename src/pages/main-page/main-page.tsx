@@ -6,12 +6,15 @@ import { Outlet } from 'react-router';
 import { CharacterListSection } from '../../components/character-list-section/character-list-section';
 import { useMainPage } from '../../hooks/use-main-page';
 import { SelectionBar } from '../../components/selection-bar/selection-bar';
+import { Button } from '../../components/shared/button/button';
+import { Loader } from '../../components/shared/loader/loader';
 
 export function MainPage() {
   const {
     characters,
     isLoading,
-    error,
+    isFetching,
+    errorMessage,
     currentPage,
     totalPages,
     searchValue,
@@ -22,6 +25,7 @@ export function MainPage() {
     handlePageChange,
     openDetails,
     closeDetails,
+    handleRefresh,
   } = useMainPage();
 
   return (
@@ -31,15 +35,28 @@ export function MainPage() {
 
         <div className="error-button-wrapper">
           <ErrorTestButton />
+          <Button onClick={handleRefresh} disabled={isFetching}>
+            {isFetching ? 'Refreshing...' : 'Refresh'}
+          </Button>
         </div>
 
-        <CharacterListSection
-          isLoading={isLoading}
-          error={error}
-          characters={characters}
-          selectedCharacterId={selectedCharacterId}
-          onSelectCharacter={openDetails}
-        />
+        <div className="main-page__list-wrapper">
+          <CharacterListSection
+            isLoading={isLoading}
+            error={errorMessage}
+            characters={characters}
+            selectedCharacterId={selectedCharacterId}
+            onSelectCharacter={openDetails}
+          />
+
+          {isFetching && !isLoading && characters.length > 0 && (
+            <div className="main-page__list-refreshing" aria-label="Refreshing characters">
+              <div className="main-page__list-loader">
+                <Loader />
+              </div>
+            </div>
+          )}
+        </div>
 
         {shouldShowPagination && (
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />

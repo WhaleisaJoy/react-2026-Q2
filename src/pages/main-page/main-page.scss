@@ -17,4 +17,33 @@
     position: sticky;
     top: 10px;
   }
+
+  &__list-wrapper {
+    position: relative;
+    min-height: 160px;
+  }
+
+  &__list-refreshing {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background-color: color-mix(in srgb, var(--card-bg) 50%, transparent);
+    pointer-events: none;
+  }
+
+  &__list-loader {
+    position: fixed;
+    top: 45vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .loader {
+      width: 32px;
+    }
+  }
 }

@@ -1,4 +1,5 @@
 .character-details {
+  position: relative;
   padding: 20px;
   border: 1px solid var(--accent);
   border-radius: 12px;
@@ -86,6 +87,24 @@
       margin: 0;
       text-align: right;
       font-weight: 800;
+    }
+  }
+
+  &__refreshing {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border-radius: 10px;
+    background-color: color-mix(in srgb, var(--card-bg) 50%, transparent);
+    pointer-events: none;
+
+    .loader {
+      width: 28px;
     }
   }
 }

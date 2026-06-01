@@ -1,6 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import './error-boundary.scss';
 import { Button } from '../shared/button/button';
+import { ErrorMessage } from '../shared/error-message/error-message';
 
 interface State {
   hasError: boolean;
@@ -33,13 +34,11 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div className="error-boundary-wrapper">
-          <div className="app-error" role="alert">
-            <h3 className="app-error__title">Something went wrong.</h3>
-            <p>Please try refreshing the page or come back later.</p>
+          <ErrorMessage title="Something went wrong." message="Please try refreshing the page or come back later.">
             <Button className="error-boundary__button" type="button" onClick={this.handleReload}>
               Reload app
             </Button>
-          </div>
+          </ErrorMessage>
         </div>
       );
     }
