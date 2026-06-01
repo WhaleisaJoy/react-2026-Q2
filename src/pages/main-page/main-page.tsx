@@ -7,6 +7,7 @@ import { CharacterListSection } from '../../components/character-list-section/ch
 import { useMainPage } from '../../hooks/use-main-page';
 import { SelectionBar } from '../../components/selection-bar/selection-bar';
 import { Button } from '../../components/shared/button/button';
+import { Loader } from '../../components/shared/loader/loader';
 
 export function MainPage() {
   const {
@@ -39,13 +40,23 @@ export function MainPage() {
           </Button>
         </div>
 
-        <CharacterListSection
-          isLoading={isLoading}
-          error={errorMessage}
-          characters={characters}
-          selectedCharacterId={selectedCharacterId}
-          onSelectCharacter={openDetails}
-        />
+        <div className="main-page__list-wrapper">
+          <CharacterListSection
+            isLoading={isLoading}
+            error={errorMessage}
+            characters={characters}
+            selectedCharacterId={selectedCharacterId}
+            onSelectCharacter={openDetails}
+          />
+
+          {isFetching && !isLoading && characters.length > 0 && (
+            <div className="main-page__list-refreshing" aria-label="Refreshing characters">
+              <div className="main-page__list-loader">
+                <Loader />
+              </div>
+            </div>
+          )}
+        </div>
 
         {shouldShowPagination && (
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />

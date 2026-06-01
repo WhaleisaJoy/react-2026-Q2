@@ -83,4 +83,18 @@ describe('CharacterDetails', () => {
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  it('should show refresh indicator while details are refetching', () => {
+    vi.mocked(useGetCharacterQuery).mockReturnValue({
+      data: mockCharacter,
+      isLoading: false,
+      isFetching: true,
+      error: undefined,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useGetCharacterQuery>);
+
+    render(<CharacterDetails />);
+
+    expect(screen.getByRole('status', { name: /loading/i })).toBeInTheDocument();
+  });
 });

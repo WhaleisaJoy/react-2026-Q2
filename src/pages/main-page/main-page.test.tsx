@@ -262,4 +262,20 @@ describe('MainPage', () => {
 
     expect(fetch).toHaveBeenCalledTimes(2);
   });
+
+  it('should show list refresh indicator while characters are refetching', async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(createJsonResponse(mockCharactersResponse))
+      .mockReturnValueOnce(new Promise(() => {}) as Promise<Response>);
+
+    renderMainPage();
+
+    expect(await screen.findByRole('heading', { name: mockCharacters[0].name })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /refresh/i }));
+
+    expect(await screen.findByLabelText(/refreshing characters/i)).toBeInTheDocument();
+  });
 });

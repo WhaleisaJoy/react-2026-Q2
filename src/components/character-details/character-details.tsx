@@ -13,7 +13,7 @@ interface Context {
 export function CharacterDetails() {
   const { selectedCharacterId, onClose } = useOutletContext<Context>();
 
-  const { data: character, isLoading, error } = useGetCharacterQuery(selectedCharacterId);
+  const { data: character, isLoading, isFetching, error } = useGetCharacterQuery(selectedCharacterId);
   const errorMessage = error ? getDetailsErrorMessage(error) : null;
 
   return (
@@ -72,6 +72,12 @@ export function CharacterDetails() {
               <dd>{character.episode.length}</dd>
             </div>
           </dl>
+        </div>
+      )}
+
+      {isFetching && !isLoading && character && (
+        <div className="character-details__refreshing">
+          <Loader />
         </div>
       )}
     </div>
