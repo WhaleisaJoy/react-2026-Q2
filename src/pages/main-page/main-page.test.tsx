@@ -198,4 +198,68 @@ describe('MainPage', () => {
 
     expect(await screen.findByText(/Page 1 of 3/i)).toBeInTheDocument();
   });
+
+  it('should refetch characters when refresh button is clicked', async () => {
+    const user = userEvent.setup();
+
+    renderMainPage();
+
+    expect(await screen.findByRole('heading', { name: mockCharacters[0].name })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /refresh/i }));
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  it('should show loader while characters are loading', () => {
+    vi.mocked(fetch).mockReturnValueOnce(new Promise(() => {}) as Promise<Response>);
+
+    renderMainPage();
+
+    expect(screen.getByRole('status', { name: /loading/i })).toBeInTheDocument();
+  });
+
+  it('should reuse cached characters when returning to a previously loaded page', async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(
+        createJsonResponse({
+          ...mockCharactersResponse,
+          info: {
+            ...mockCharactersResponse.info,
+            pages: 2,
+          },
+        })
+      )
+      .mockResolvedValueOnce(
+        createJsonResponse({
+          ...mockCharactersResponse,
+          info: {
+            ...mockCharactersResponse.info,
+            pages: 2,
+          },
+        })
+      );
+
+    renderMainPage('/?page=1');
+
+    expect(await screen.findByRole('heading', { name: mockCharacters[0].name })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '>' }));
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledTimes(2);
+    });
+
+    await user.click(screen.getByRole('button', { name: '<' }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Page 1 of 2/i)).toBeInTheDocument();
+    });
+
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
 });

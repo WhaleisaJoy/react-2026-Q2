@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { ramApi } from './ramapi-service';
-import { mockCharactersResponse } from '../test-utils/mocks/characters';
+import { mockCharacters, mockCharactersResponse } from '../test-utils/mocks/characters';
 
 const createStore = () =>
   configureStore({
@@ -56,5 +56,50 @@ describe('ramApi', () => {
     expect(result.error).toMatchObject({
       status: 404,
     });
+  });
+
+  it('should reuse cached character details for the same id', async () => {
+    const mockCharacter = mockCharacters[0];
+
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify(mockCharacter), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    const store = createStore();
+
+    const firstResult = await store.dispatch(ramApi.endpoints.getCharacter.initiate(mockCharacter.id));
+
+    const secondResult = await store.dispatch(ramApi.endpoints.getCharacter.initiate(mockCharacter.id));
+
+    expect(firstResult.data).toEqual(mockCharacter);
+    expect(secondResult.data).toEqual(mockCharacter);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('should reuse cached characters for the same query args', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify(mockCharactersResponse), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    const store = createStore();
+
+    const queryArgs = {
+      name: 'rick',
+      page: 1,
+    };
+
+    const firstResult = await store.dispatch(ramApi.endpoints.getCharacters.initiate(queryArgs));
+
+    const secondResult = await store.dispatch(ramApi.endpoints.getCharacters.initiate(queryArgs));
+
+    expect(firstResult.data).toEqual(mockCharactersResponse);
+    expect(secondResult.data).toEqual(mockCharactersResponse);
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 });
