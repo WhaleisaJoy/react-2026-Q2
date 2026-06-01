@@ -6,11 +6,13 @@ import { Outlet } from 'react-router';
 import { CharacterListSection } from '../../components/character-list-section/character-list-section';
 import { useMainPage } from '../../hooks/use-main-page';
 import { SelectionBar } from '../../components/selection-bar/selection-bar';
+import { Button } from '../../components/shared/button/button';
 
 export function MainPage() {
   const {
     characters,
     isLoading,
+    isFetching,
     errorMessage,
     currentPage,
     totalPages,
@@ -22,6 +24,7 @@ export function MainPage() {
     handlePageChange,
     openDetails,
     closeDetails,
+    handleRefresh,
   } = useMainPage();
 
   return (
@@ -31,6 +34,9 @@ export function MainPage() {
 
         <div className="error-button-wrapper">
           <ErrorTestButton />
+          <Button onClick={handleRefresh} disabled={isFetching}>
+            {isFetching ? 'Refreshing...' : 'Refresh'}
+          </Button>
         </div>
 
         <CharacterListSection

@@ -3,12 +3,14 @@ import type { Character } from '../types/character';
 import { getValidDetailsId, getValidPage } from '../utils/url-params.utils';
 import { useUrlParams } from './use-url-params';
 import { useCharacterSearch } from './use-character-search';
-import { useGetCharactersQuery } from '../api/ramapi-service';
+import { ramApi, useGetCharactersQuery } from '../api/ramapi-service';
 import { getCharactersErrorMessage } from '../api/error-messages';
+import { useAppDispatch } from '.';
 
 interface UseMainPageResult {
   characters: Character[];
   isLoading: boolean;
+  isFetching: boolean;
   errorMessage: string | null;
   currentPage: number;
   totalPages: number;
@@ -20,9 +22,12 @@ interface UseMainPageResult {
   handlePageChange: (page: number) => void;
   openDetails: (id: number) => void;
   closeDetails: () => void;
+  handleRefresh: () => void;
 }
 
 export function useMainPage(): UseMainPageResult {
+  const dispatch = useAppDispatch();
+
   const { searchParams, updateUrlParams } = useUrlParams();
 
   const selectedCharacterId = getValidDetailsId(searchParams.get('details'));
@@ -50,7 +55,7 @@ export function useMainPage(): UseMainPageResult {
     });
   });
 
-  const { data, isLoading, error } = useGetCharactersQuery({
+  const { data, isLoading, isFetching, error } = useGetCharactersQuery({
     name: submittedSearchValue.trim(),
     page: currentPage,
   });
@@ -81,11 +86,21 @@ export function useMainPage(): UseMainPageResult {
     });
   };
 
+  const handleRefresh = () => {
+    dispatch(
+      ramApi.util.invalidateTags([
+        { type: 'Characters', id: 'LIST' },
+        ...(selectedCharacterId ? [{ type: 'Character' as const, id: selectedCharacterId }] : []),
+      ])
+    );
+  };
+
   const shouldShowPagination = !isLoading && !errorMessage && characters.length > 0 && totalPages > 1;
 
   return {
     characters,
     isLoading,
+    isFetching,
     errorMessage,
     currentPage,
     totalPages,
@@ -97,5 +112,6 @@ export function useMainPage(): UseMainPageResult {
     handlePageChange,
     openDetails,
     closeDetails,
+    handleRefresh,
   };
 }
