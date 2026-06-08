@@ -5,6 +5,7 @@ import { formSchema, type UserFormValues } from '../../schemas/form-schema';
 import { fileToBase64 } from '../../utils/file-to-base64.utils';
 import { useAppDispatch } from '../../store/hooks';
 import { addSubmission } from '../../store/submissions-reducer/submissions-reducer';
+import { PasswordStrengthIndicator } from '../password-strength-indicator/password-strength-indicator';
 
 interface Props {
   onSubmit: () => void;
@@ -14,6 +15,7 @@ export function UncontrolledForm({ onSubmit }: Props) {
   const dispatch = useAppDispatch();
   const formRef = useRef<HTMLFormElement>(null);
 
+  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Partial<Record<keyof UserFormValues, string>>>({});
 
   const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
@@ -108,10 +110,18 @@ export function UncontrolledForm({ onSubmit }: Props) {
         <label className="form__label" htmlFor="password">
           Password
         </label>
-        <input className="form__input" type="password" id="password" name="password" required />
+        <input
+          className="form__input"
+          type="password"
+          id="password"
+          name="password"
+          required
+          onChange={(e) => setPassword(e.target.value)}
+        />
         <span className="form__error" role="alert">
           {errors.password ?? ''}
         </span>
+        <PasswordStrengthIndicator password={password} />
       </div>
 
       <div className="form__field">

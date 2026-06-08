@@ -4,8 +4,10 @@ import { formSchema, type UserFormValues } from '../../schemas/form-schema';
 import { fileToBase64 } from '../../utils/file-to-base64.utils';
 import { useAppDispatch } from '../../store/hooks';
 import { addSubmission } from '../../store/submissions-reducer/submissions-reducer';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
+import { PasswordStrengthIndicator } from '../password-strength-indicator/password-strength-indicator';
 
 interface Props {
   onSubmit: () => void;
@@ -16,13 +18,22 @@ export function RHFForm({ onSubmit }: Props) {
   const {
     register,
     control,
+    trigger,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, touchedFields },
     reset,
   } = useForm<UserFormValues>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
   });
+
+  const password = useWatch({ control, name: 'password' });
+
+  useEffect(() => {
+    if (touchedFields.confirmPassword) {
+      void trigger('confirmPassword');
+    }
+  }, [password, trigger, touchedFields.confirmPassword]);
 
   const onFormSubmit = async (data: UserFormValues) => {
     const { image, ...formDataWithoutImage } = data;
@@ -100,6 +111,7 @@ export function RHFForm({ onSubmit }: Props) {
         <span className="form__error" role="alert">
           {errors.password?.message ?? ''}
         </span>
+        <PasswordStrengthIndicator password={password || ''} />
       </div>
 
       <div className="form__field">
