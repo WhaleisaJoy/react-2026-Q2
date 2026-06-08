@@ -5,6 +5,7 @@ import { UncontrolledForm } from './components/uncontrolled-form/uncontrolled-fo
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 import { RHFForm } from './components/rhf-form/rhf-form';
+import { SubmissionHistory } from './components/submission-history/submission-history';
 
 type FormType = 'uncontrolled' | 'rhf' | null;
 
@@ -29,6 +30,8 @@ function App() {
               Open RHF form
             </button>
           </div>
+
+          <SubmissionHistory />
         </main>
 
         <Modal
