@@ -46,7 +46,12 @@ export const formSchema = z
       .refine((file) => file.size <= MAX_FILE_SIZE, 'Maximum image size is 5 MB')
       .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), 'Only PNG and JPEG images are allowed'),
   })
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ['confirmPassword'],
-    message: 'Passwords do not match',
+  .superRefine((data, ctx) => {
+    if (data.password !== data.confirmPassword) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Passwords do not match',
+        path: ['confirmPassword'],
+      });
+    }
   });

@@ -3,11 +3,12 @@ import type { Submission } from '../../types/submission';
 
 interface Props {
   submission: Submission;
+  isNew: boolean;
 }
 
-export function SubmissionCard({ submission }: Props) {
+export function SubmissionCard({ submission, isNew }: Props) {
   return (
-    <article className="submission-card">
+    <article className={`submission-card ${isNew ? 'submission-card--new' : ''}`}>
       <h2 className="submission-card__name">{submission.name}</h2>
       <figure className="submission-card__image-wrapper">
         <img className="submission-card__image" src={submission.imageBase64} alt={submission.name} loading="lazy" />

@@ -7,4 +7,5 @@ export interface CountriesState {
 
 export interface SubmissionsState {
   submissions: Submission[];
+  newSubmissionId: string | null;
 }

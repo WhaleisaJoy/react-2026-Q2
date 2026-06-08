@@ -4,6 +4,7 @@ import type { Submission } from '../../types/submission';
 
 const initialState: SubmissionsState = {
   submissions: [],
+  newSubmissionId: null,
 };
 
 const submissionsSlice = createSlice({
@@ -11,7 +12,8 @@ const submissionsSlice = createSlice({
   initialState,
   reducers: {
     addSubmission: (state, action: PayloadAction<Submission>) => {
-      state.submissions.push(action.payload);
+      state.submissions.unshift(action.payload);
+      state.newSubmissionId = action.payload.id;
     },
   },
 });

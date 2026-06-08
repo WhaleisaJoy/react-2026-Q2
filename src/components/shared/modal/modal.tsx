@@ -32,14 +32,20 @@ export function Modal({ isOpen, title, onClose, children }: PropsWithChildren<Pr
     <dialog
       ref={dialogRef}
       className="modal-overlay"
+      aria-modal="true"
+      aria-labelledby="modal-title"
       onClose={onClose}
       onClick={(e) => e.target === dialogRef.current && onClose()}
     >
-      <div className="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div className="modal-content">
         <header className="modal-header">
-          <h2 className="modal-title">{title}</h2>
+          <h2 id="modal-title" className="modal-title">
+            {title}
+          </h2>
           <button
             className="modal-close"
+            type="button"
+            aria-label="Close modal"
             onClick={() => {
               dialogRef.current?.close();
               onClose();
