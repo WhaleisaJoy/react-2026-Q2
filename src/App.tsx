@@ -4,6 +4,7 @@ import { Modal } from './components/shared/modal/modal';
 import { UncontrolledForm } from './components/uncontrolled-form/uncontrolled-form';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
+import { RHFForm } from './components/rhf-form/rhf-form';
 
 type FormType = 'uncontrolled' | 'rhf' | null;
 
@@ -11,6 +12,7 @@ function App() {
   const [openedForm, setOpenedForm] = useState<FormType>(null);
 
   const openUncontrolledForm = () => setOpenedForm('uncontrolled');
+  const openRHFForm = () => setOpenedForm('rhf');
   const closeModal = () => setOpenedForm(null);
 
   return (
@@ -23,6 +25,9 @@ function App() {
             <button type="button" className="button" onClick={openUncontrolledForm}>
               Open uncontrolled form
             </button>
+            <button type="button" className="button" onClick={openRHFForm}>
+              Open RHF form
+            </button>
           </div>
         </main>
 
@@ -32,6 +37,7 @@ function App() {
           onClose={closeModal}
         >
           {openedForm === 'uncontrolled' && <UncontrolledForm onSubmit={closeModal} />}
+          {openedForm === 'rhf' && <RHFForm onSubmit={closeModal} />}
         </Modal>
       </div>
     </Provider>

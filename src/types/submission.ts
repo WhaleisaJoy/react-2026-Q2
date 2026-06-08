@@ -1,5 +1,6 @@
-import type { FormData } from '../schemas/form-schema';
+import type { UserFormValues } from '../schemas/form-schema';
 
-export type Submission = Omit<FormData, 'image'> & {
+export type Submission = Omit<UserFormValues, 'image'> & {
+  id: string;
   imageBase64: string;
 };
