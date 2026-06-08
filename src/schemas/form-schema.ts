@@ -5,7 +5,7 @@ import { isValidEmail } from '../utils/validation.util';
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = ['image/png', 'image/jpeg'];
 
-export type FormData = z.infer<typeof formSchema>;
+export type UserFormValues = z.infer<typeof formSchema>;
 
 export const formSchema = z
   .object({
@@ -15,16 +15,17 @@ export const formSchema = z
       .min(1, 'Name is required')
       .refine((value) => value[0] === value[0]?.toUpperCase(), 'First letter must be uppercase'),
 
-    age: z.coerce
-      .number({
-        error: 'Age is required',
-      })
-      .min(0, 'Age cannot be negative'),
+    age: z
+      .string()
+      .trim()
+      .min(1, 'Age is required')
+      .refine((value) => !Number.isNaN(Number(value)), 'Age must be a number')
+      .refine((value) => Number(value) >= 0, 'Age cannot be negative'),
 
     email: z.string().min(1, 'Email is required').refine(isValidEmail, 'Invalid email'),
 
     gender: z.enum(['male', 'female'], {
-      message: 'Gender is required',
+      error: 'Gender is required',
     }),
 
     country: z.enum(countries, {
@@ -34,7 +35,7 @@ export const formSchema = z
     password: z.string().min(1, 'Password is required'),
     confirmPassword: z.string().min(1, 'Confirm password is required'),
 
-    acceptedTerms: z.literal(true, {
+    terms: z.literal(true, {
       message: 'You must accept Terms & Conditions',
     }),
 
