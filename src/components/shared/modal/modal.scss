@@ -5,10 +5,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--space-lg);
-    background-color: var(--bg-overlay);
-    backdrop-filter: blur(3px);
+    padding: 0;
+    border: none;
     z-index: 1000;
+
+    &::backdrop {
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(3px);
+    }
   }
 
   &-content {
@@ -48,7 +52,7 @@
     transition: all 0.3s ease;
 
     &:hover {
-      color: var(--accent);
+      color: var(--color-accent);
     }
   }
 }
