@@ -13,7 +13,6 @@ type CountryListProps = {
   selectedYear: number;
   sortField: 'name' | 'population';
   sortOrder: 'asc' | 'desc';
-  onYearChange: (year: number) => void;
 };
 
 export const CountryList = ({
