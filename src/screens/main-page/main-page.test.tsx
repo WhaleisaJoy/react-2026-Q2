@@ -60,7 +60,7 @@ describe('MainPage', () => {
     pushMock.mockClear();
     replaceMock.mockClear();
     vi.stubGlobal('fetch', vi.fn());
-    vi.mocked(fetch).mockResolvedValue(createJsonResponse(mockCharactersResponse));
+    vi.mocked(fetch).mockImplementation(() => Promise.resolve(createJsonResponse(mockCharactersResponse)));
   });
 
   it('should load first page of characters on initial render', async () => {

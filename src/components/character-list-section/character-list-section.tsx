@@ -35,12 +35,13 @@ export function CharacterListSection({ isLoading, error, characters, selectedCha
 
   return (
     <CharacterList>
-      {characters.map((character) => (
+      {characters.map((character, index) => (
         <div key={character.id} className="character-list__item">
           <CharacterCard
             character={character}
             isCardSelected={character.id === selectedCharacterId}
             isCheckboxSelected={selectedCharactersId.includes(character.id)}
+            isLcpImage={index < 3}
             onCardSelect={onSelectCharacter}
             onCheckboxToggle={onSelectionToggle}
           />

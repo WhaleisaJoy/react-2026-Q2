@@ -35,9 +35,10 @@ describe('CharacterCard', () => {
     renderCharacterCard();
 
     const image = screen.getByRole('img', { name: mockCharacter.name });
+
     expect(image).toBeInTheDocument();
-    expect(image).toHaveAttribute('src', mockCharacter.image);
     expect(image).toHaveAttribute('alt', mockCharacter.name);
+    expect(decodeURIComponent(image.getAttribute('src') ?? '')).toContain(mockCharacter.image);
   });
 
   it('should use lazy loading for character image', () => {

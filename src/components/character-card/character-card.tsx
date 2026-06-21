@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import type { Character } from '../../types/character';
 import './character-card.scss';
 import type { KeyboardEvent, MouseEvent } from 'react';
@@ -6,6 +7,7 @@ interface Props {
   character: Character;
   isCardSelected?: boolean;
   isCheckboxSelected: boolean;
+  isLcpImage?: boolean;
   onCardSelect: (id: number) => void;
   onCheckboxToggle: (character: Character) => void;
 }
@@ -14,6 +16,7 @@ export function CharacterCard({
   character,
   isCardSelected,
   isCheckboxSelected,
+  isLcpImage,
   onCardSelect,
   onCheckboxToggle,
 }: Props) {
@@ -64,7 +67,15 @@ export function CharacterCard({
 
       <div className="character-card__body">
         <figure className="character-card__image-wrapper">
-          <img className="character-card__image" src={character.image} alt={character.name} loading="lazy" />
+          <Image
+            className="character-card__image"
+            src={character.image}
+            alt={character.name}
+            width={120}
+            height={120}
+            fetchPriority={isLcpImage ? 'high' : 'auto'}
+            loading={isLcpImage ? 'eager' : 'lazy'}
+          />
         </figure>
 
         <div className="character-card__content">

@@ -3,6 +3,7 @@ import { useGetCharacterQuery } from '../../api/ramapi-service';
 import { Loader } from '../shared/loader/loader';
 import { ErrorMessage } from '../shared/error-message/error-message';
 import { getDetailsErrorMessage } from '../../api/error-messages';
+import Image from 'next/image';
 
 interface Props {
   selectedCharacterId: number;
@@ -26,7 +27,7 @@ export function CharacterDetails({ selectedCharacterId, onClose }: Props) {
       {!isLoading && character && (
         <div className="character-details__content">
           <figure className="character-details__image-wrapper">
-            <img
+            <Image
               className="character-details__image"
               src={character.image}
               alt={character.name}
