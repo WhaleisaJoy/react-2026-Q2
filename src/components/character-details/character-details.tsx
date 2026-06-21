@@ -1,18 +1,15 @@
 import './character-details.scss';
-import { useOutletContext } from 'react-router';
 import { useGetCharacterQuery } from '../../api/ramapi-service';
 import { Loader } from '../shared/loader/loader';
 import { ErrorMessage } from '../shared/error-message/error-message';
 import { getDetailsErrorMessage } from '../../api/error-messages';
 
-interface Context {
+interface Props {
   selectedCharacterId: number;
   onClose: () => void;
 }
 
-export function CharacterDetails() {
-  const { selectedCharacterId, onClose } = useOutletContext<Context>();
-
+export function CharacterDetails({ selectedCharacterId, onClose }: Props) {
   const { data: character, isLoading, isFetching, error } = useGetCharacterQuery(selectedCharacterId);
   const errorMessage = error ? getDetailsErrorMessage(error) : null;
 

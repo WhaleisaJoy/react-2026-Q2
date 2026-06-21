@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useOutletContext } from 'react-router';
 import { useGetCharacterQuery } from '../../api/ramapi-service';
 import { mockCharacters } from '../../test-utils/mocks/characters';
 import { CharacterDetails } from './character-details';
@@ -9,24 +8,16 @@ vi.mock('../../api/ramapi-service', () => ({
   useGetCharacterQuery: vi.fn(),
 }));
 
-vi.mock('react-router', async () => {
-  const actual = await vi.importActual<typeof import('react-router')>('react-router');
-
-  return {
-    ...actual,
-    useOutletContext: vi.fn(),
-  };
-});
-
 describe('CharacterDetails', () => {
   const mockCharacter = mockCharacters[0];
   const onClose = vi.fn();
 
+  const renderCharacterDetails = () => {
+    render(<CharacterDetails selectedCharacterId={mockCharacter.id} onClose={onClose} />);
+  };
+
   beforeEach(() => {
-    vi.mocked(useOutletContext).mockReturnValue({
-      selectedCharacterId: mockCharacter.id,
-      onClose,
-    });
+    onClose.mockClear();
 
     vi.mocked(useGetCharacterQuery).mockReturnValue({
       data: mockCharacter,
@@ -37,7 +28,7 @@ describe('CharacterDetails', () => {
   });
 
   it('should request character details by selected id', () => {
-    render(<CharacterDetails />);
+    renderCharacterDetails();
 
     expect(useGetCharacterQuery).toHaveBeenCalledWith(mockCharacter.id);
   });
@@ -50,13 +41,13 @@ describe('CharacterDetails', () => {
       refetch: vi.fn(),
     } as ReturnType<typeof useGetCharacterQuery>);
 
-    render(<CharacterDetails />);
+    renderCharacterDetails();
 
     expect(screen.getByRole('status', { name: /loading/i })).toBeInTheDocument();
   });
 
   it('should render character details after successful request', () => {
-    render(<CharacterDetails />);
+    renderCharacterDetails();
 
     expect(screen.getByRole('heading', { name: mockCharacter.name })).toBeInTheDocument();
   });
@@ -69,7 +60,7 @@ describe('CharacterDetails', () => {
       refetch: vi.fn(),
     } as ReturnType<typeof useGetCharacterQuery>);
 
-    render(<CharacterDetails />);
+    renderCharacterDetails();
 
     expect(screen.getByRole('alert')).toHaveTextContent('Character details were not found.');
   });
@@ -77,7 +68,7 @@ describe('CharacterDetails', () => {
   it('should call onClose when close button is clicked', async () => {
     const user = userEvent.setup();
 
-    render(<CharacterDetails />);
+    renderCharacterDetails();
 
     await user.click(screen.getByRole('button', { name: /close details/i }));
 
@@ -93,7 +84,7 @@ describe('CharacterDetails', () => {
       refetch: vi.fn(),
     } as unknown as ReturnType<typeof useGetCharacterQuery>);
 
-    render(<CharacterDetails />);
+    renderCharacterDetails();
 
     expect(screen.getByRole('status', { name: /loading/i })).toBeInTheDocument();
   });

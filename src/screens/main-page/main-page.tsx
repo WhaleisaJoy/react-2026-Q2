@@ -1,13 +1,15 @@
+'use client';
+
 import './main-page.scss';
 import { ErrorTestButton } from '../../components/error-test-button/error-test-button';
 import { Search } from '../../components/search/search';
 import { Pagination } from '../../components/pagination/pagination';
-import { Outlet } from 'react-router';
 import { CharacterListSection } from '../../components/character-list-section/character-list-section';
 import { useMainPage } from '../../hooks/use-main-page';
 import { SelectionBar } from '../../components/selection-bar/selection-bar';
 import { Button } from '../../components/shared/button/button';
 import { Loader } from '../../components/shared/loader/loader';
+import { CharacterDetails } from '../../components/character-details/character-details';
 
 export function MainPage() {
   const {
@@ -65,7 +67,7 @@ export function MainPage() {
 
       {selectedCharacterId && (
         <aside className="main-page__details">
-          <Outlet context={{ selectedCharacterId, onClose: closeDetails }} />
+          <CharacterDetails selectedCharacterId={selectedCharacterId} onClose={closeDetails} />
         </aside>
       )}
 

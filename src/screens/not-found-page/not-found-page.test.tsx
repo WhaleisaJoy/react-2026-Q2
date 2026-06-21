@@ -1,13 +1,15 @@
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
 import { NotFoundPage } from './not-found-page';
+import { usePathname } from 'next/navigation';
+
+vi.mock('next/navigation', () => ({
+  usePathname: vi.fn(),
+}));
 
 const renderNotFoundPage = () => {
-  render(
-    <MemoryRouter>
-      <NotFoundPage />
-    </MemoryRouter>
-  );
+  vi.mocked(usePathname);
+
+  render(<NotFoundPage />);
 };
 
 describe('NotFoundPage', () => {

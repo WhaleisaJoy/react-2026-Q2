@@ -1,17 +1,21 @@
 import { render } from '@testing-library/react';
 import { screen } from '@testing-library/react';
 import { Header } from './header';
-import { MemoryRouter } from 'react-router';
-import { APP_ROUTES } from '../../router/routes';
+import { usePathname } from 'next/navigation';
+import { APP_ROUTES } from '../../constants/routes';
 import { ThemeProvider } from '../../context/theme-provider';
 
+vi.mock('next/navigation', () => ({
+  usePathname: vi.fn(),
+}));
+
 const renderHeader = (path = '/') => {
+  vi.mocked(usePathname).mockReturnValue(path);
+
   render(
-    <MemoryRouter initialEntries={[path]}>
-      <ThemeProvider>
-        <Header />
-      </ThemeProvider>
-    </MemoryRouter>
+    <ThemeProvider>
+      <Header />
+    </ThemeProvider>
   );
 };
 
@@ -25,9 +29,9 @@ describe('Header', () => {
   it('should render navigation links', () => {
     renderHeader();
 
-    expect(screen.getByRole('link', { name: /rickverse search/i })).toHaveAttribute('href', APP_ROUTES.MAIN.to);
-    expect(screen.getByRole('link', { name: /main/i })).toHaveAttribute('href', APP_ROUTES.MAIN.to);
-    expect(screen.getByRole('link', { name: /about/i })).toHaveAttribute('href', APP_ROUTES.ABOUT.to);
+    expect(screen.getByRole('link', { name: /rickverse search/i })).toHaveAttribute('href', APP_ROUTES.MAIN);
+    expect(screen.getByRole('link', { name: /main/i })).toHaveAttribute('href', APP_ROUTES.MAIN);
+    expect(screen.getByRole('link', { name: /about/i })).toHaveAttribute('href', APP_ROUTES.ABOUT);
   });
 
   it('should mark main link as active on main page', () => {

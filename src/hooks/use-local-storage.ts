@@ -1,7 +1,15 @@
+'use client';
+
 import { useCallback, useState } from 'react';
 
 export function useLocalStorage(key: string, initialValue = '') {
-  const [value, setStateValue] = useState(() => localStorage.getItem(key) ?? initialValue);
+  const [value, setStateValue] = useState(() => {
+    if (typeof window === 'undefined') {
+      return initialValue;
+    }
+
+    return localStorage.getItem(key) ?? initialValue;
+  });
 
   const setValue = useCallback(
     (newValue: string) => {

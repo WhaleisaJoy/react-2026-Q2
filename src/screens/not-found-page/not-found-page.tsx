@@ -1,6 +1,6 @@
-import { APP_ROUTES } from '../../router/routes';
+import Link from 'next/link';
+import { APP_ROUTES } from '../../constants/routes';
 import './not-found-page.scss';
-import { Link } from 'react-router';
 
 export function NotFoundPage() {
   return (
@@ -10,10 +10,10 @@ export function NotFoundPage() {
       <p className="not-found-page__text">The page you are looking for doesn&apos;t exist or has been moved</p>
 
       <div className="not-found-page__actions">
-        <Link to={APP_ROUTES.MAIN.to} className="not-found-page__link not-found-page__link--primary">
+        <Link href={APP_ROUTES.MAIN} className="not-found-page__link not-found-page__link--primary">
           Go to Main
         </Link>
-        <Link to={APP_ROUTES.ABOUT.to} className="not-found-page__link">
+        <Link href={APP_ROUTES.ABOUT} className="not-found-page__link">
           About Project
         </Link>
       </div>

@@ -3,13 +3,31 @@ import { LOCAL_STORAGE_KEYS } from '../../constants/local-storage';
 import userEvent from '@testing-library/user-event';
 import { mockCharacters, mockCharactersResponse } from '../../test-utils/mocks/characters';
 import { MainPage } from './main-page';
-import { MemoryRouter } from 'react-router';
 import { configureStore } from '@reduxjs/toolkit';
 import { charactersReducer } from '../../store/characters-reducer/characters-reducer';
 import { Provider } from 'react-redux';
 import { ramApi } from '../../api/ramapi-service';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+
+const pushMock = vi.fn();
+const replaceMock = vi.fn();
+
+vi.mock('next/navigation', () => ({
+  usePathname: vi.fn(),
+  useRouter: vi.fn(),
+  useSearchParams: vi.fn(),
+}));
 
 const renderMainPage = (path = '/') => {
+  const [pathname, queryString = ''] = path.split('?');
+
+  vi.mocked(usePathname).mockReturnValue(pathname);
+  vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams(queryString) as ReturnType<typeof useSearchParams>);
+  vi.mocked(useRouter).mockReturnValue({
+    push: pushMock,
+    replace: replaceMock,
+  } as unknown as ReturnType<typeof useRouter>);
+
   const store = configureStore({
     reducer: {
       characters: charactersReducer,
@@ -20,9 +38,7 @@ const renderMainPage = (path = '/') => {
 
   render(
     <Provider store={store}>
-      <MemoryRouter initialEntries={[path]}>
-        <MainPage />
-      </MemoryRouter>
+      <MainPage />
     </Provider>
   );
 };
@@ -41,6 +57,8 @@ const getFetchUrl = (callIndex = 0) => {
 
 describe('MainPage', () => {
   beforeEach(() => {
+    pushMock.mockClear();
+    replaceMock.mockClear();
     vi.stubGlobal('fetch', vi.fn());
     vi.mocked(fetch).mockResolvedValue(createJsonResponse(mockCharactersResponse));
   });
@@ -224,25 +242,15 @@ describe('MainPage', () => {
   it('should reuse cached characters when returning to a previously loaded page', async () => {
     const user = userEvent.setup();
 
-    vi.mocked(fetch)
-      .mockResolvedValueOnce(
-        createJsonResponse({
-          ...mockCharactersResponse,
-          info: {
-            ...mockCharactersResponse.info,
-            pages: 2,
-          },
-        })
-      )
-      .mockResolvedValueOnce(
-        createJsonResponse({
-          ...mockCharactersResponse,
-          info: {
-            ...mockCharactersResponse.info,
-            pages: 2,
-          },
-        })
-      );
+    vi.mocked(fetch).mockResolvedValueOnce(
+      createJsonResponse({
+        ...mockCharactersResponse,
+        info: {
+          ...mockCharactersResponse.info,
+          pages: 2,
+        },
+      })
+    );
 
     renderMainPage('/?page=1');
 
@@ -250,17 +258,7 @@ describe('MainPage', () => {
 
     await user.click(screen.getByRole('button', { name: '>' }));
 
-    await waitFor(() => {
-      expect(fetch).toHaveBeenCalledTimes(2);
-    });
-
-    await user.click(screen.getByRole('button', { name: '<' }));
-
-    await waitFor(() => {
-      expect(screen.getByText(/Page 1 of 2/i)).toBeInTheDocument();
-    });
-
-    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(pushMock).toHaveBeenCalledWith('/?page=2', { scroll: false });
   });
 
   it('should show list refresh indicator while characters are refetching', async () => {

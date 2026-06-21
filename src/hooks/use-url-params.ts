@@ -1,5 +1,7 @@
+'use client';
+
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
-import { useSearchParams } from 'react-router';
 
 type UrlParamValue = string | number | null;
 type UrlParams = Record<string, UrlParamValue>;
@@ -8,11 +10,13 @@ interface UpdateUrlParamsOptions {
 }
 
 export function useUrlParams() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const updateUrlParams = useCallback(
     (params: UrlParams, options?: UpdateUrlParamsOptions) => {
-      const nextSearchParams = new URLSearchParams(searchParams);
+      const nextSearchParams = new URLSearchParams(searchParams.toString());
 
       Object.entries(params).forEach(([key, value]) => {
         if (value === null) {
@@ -23,11 +27,17 @@ export function useUrlParams() {
         nextSearchParams.set(key, String(value));
       });
 
-      setSearchParams(nextSearchParams, {
-        replace: options?.replace,
-      });
+      const queryString = nextSearchParams.toString();
+      const nextUrl = queryString ? `${pathname}?${queryString}` : pathname;
+
+      if (options?.replace) {
+        router.replace(nextUrl, { scroll: false });
+        return;
+      }
+
+      router.push(nextUrl, { scroll: false });
     },
-    [searchParams, setSearchParams]
+    [searchParams, pathname, router]
   );
 
   return {
