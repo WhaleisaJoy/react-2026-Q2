@@ -3,10 +3,18 @@ import { CharacterCard } from './character-card';
 import { mockCharacters } from '../../test-utils/mocks/characters';
 import userEvent from '@testing-library/user-event';
 import { renderWithIntl } from '../../test-utils/render-with-intl';
+import type { AnchorHTMLAttributes } from 'react';
+
+vi.mock('../../i18n/navigation', () => ({
+  Link: ({ href, children, ...props }: AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
+}));
 
 describe('CharacterCard', () => {
   const mockCharacter = mockCharacters[0];
-  const onSelect = vi.fn();
   const onCheckboxToggle = vi.fn();
 
   const renderCharacterCard = (isSelected = false) => {
@@ -15,14 +23,14 @@ describe('CharacterCard', () => {
         character={mockCharacter}
         isCardSelected={isSelected}
         isCheckboxSelected={false}
-        onCardSelect={onSelect}
+        searchValue=""
+        currentPage={1}
         onCheckboxToggle={onCheckboxToggle}
       />
     );
   };
 
   beforeEach(() => {
-    onSelect.mockClear();
     onCheckboxToggle.mockClear();
   });
 
@@ -56,25 +64,24 @@ describe('CharacterCard', () => {
     expect(screen.getByText(mockCharacter.gender)).toBeInTheDocument();
   });
 
-  it('should call onSelect with character id when card is clicked', async () => {
-    const user = userEvent.setup();
+  it('should render link to character details', () => {
     renderCharacterCard();
 
-    await user.click(screen.getByRole('button'));
-
-    expect(onSelect).toHaveBeenCalledTimes(1);
-    expect(onSelect).toHaveBeenCalledWith(mockCharacter.id);
+    expect(screen.getByRole('link')).toHaveAttribute('href', `?details=${mockCharacter.id}`);
   });
 
-  it('should call onSelect with character id when card is activated with keyboard', async () => {
-    const user = userEvent.setup();
-    renderCharacterCard();
+  it('should preserve search and page params in details link', () => {
+    renderWithIntl(
+      <CharacterCard
+        character={mockCharacter}
+        isCheckboxSelected={false}
+        searchValue="rick"
+        currentPage={2}
+        onCheckboxToggle={onCheckboxToggle}
+      />
+    );
 
-    screen.getByRole('button').focus();
-    await user.keyboard('{Enter}');
-
-    expect(onSelect).toHaveBeenCalledTimes(1);
-    expect(onSelect).toHaveBeenCalledWith(mockCharacter.id);
+    expect(screen.getByRole('link')).toHaveAttribute('href', `?search=rick&page=2&details=${mockCharacter.id}`);
   });
 
   it('should toggle checkbox without opening character details', async () => {
@@ -85,26 +92,5 @@ describe('CharacterCard', () => {
 
     expect(onCheckboxToggle).toHaveBeenCalledTimes(1);
     expect(onCheckboxToggle).toHaveBeenCalledWith(mockCharacter);
-    expect(onSelect).not.toHaveBeenCalled();
-  });
-
-  it('should not call onSelect when unsupported key is pressed on card', async () => {
-    const user = userEvent.setup();
-    renderCharacterCard();
-
-    screen.getByRole('button').focus();
-    await user.keyboard('a');
-
-    expect(onSelect).not.toHaveBeenCalled();
-  });
-
-  it('should not call onSelect when keydown comes from checkbox', async () => {
-    const user = userEvent.setup();
-    renderCharacterCard();
-
-    screen.getByRole('checkbox', { name: `Select ${mockCharacter.name}` }).focus();
-    await user.keyboard('{Enter}');
-
-    expect(onSelect).not.toHaveBeenCalled();
   });
 });

@@ -1,3 +1,5 @@
+'use client';
+
 import './selection-bar.scss';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getSelectedCharacters, getSelectedCharactersCount } from '../../store/characters-reducer/selectors';

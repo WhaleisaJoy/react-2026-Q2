@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { Button } from '../shared/button/button';
 import { useTranslations } from 'next-intl';

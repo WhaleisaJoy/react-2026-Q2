@@ -1,28 +1,26 @@
-import { type ChangeEvent, type SubmitEvent } from 'react';
+'use client';
+
+import { useState, type ChangeEvent } from 'react';
 import { Button } from '../shared/button/button';
 import './search.scss';
 import { useTranslations } from 'next-intl';
+import { searchCharacters } from '../../actions/search-actions';
 
 interface Props {
-  value: string;
-  onChange: (value: string) => void;
-  onSubmit: () => void;
+  initialValue: string;
 }
 
-export function Search({ value, onChange, onSubmit }: Props) {
+export function Search({ initialValue }: Props) {
   const t = useTranslations('search');
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange(event.target.value);
-  };
+  const [value, setValue] = useState(initialValue);
 
-  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    onSubmit();
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setValue(event.target.value);
   };
 
   return (
-    <form className="search" onSubmit={handleSubmit}>
+    <form className="search" action={searchCharacters}>
       <input
         id="search"
         name="search"

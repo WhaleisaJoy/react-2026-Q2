@@ -36,6 +36,7 @@
   },
   "characterCard": {
     "select": "Select {name}",
+    "openDetails": "Open details for {name}",
     "species": "Species",
     "gender": "Gender"
   },

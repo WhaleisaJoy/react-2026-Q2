@@ -17,3 +17,30 @@ export function getValidDetailsId(value: string | null): number | null {
 
   return id;
 }
+
+interface BuildSearchUrlParams {
+  searchValue?: string;
+  page?: number;
+  details?: number | null;
+}
+
+export function buildSearchUrl({ searchValue = '', page = 1, details = null }: BuildSearchUrlParams) {
+  const params = new URLSearchParams();
+  const normalizedSearchValue = searchValue.trim();
+
+  if (normalizedSearchValue !== '') {
+    params.set('search', normalizedSearchValue);
+  }
+
+  if (page > 1) {
+    params.set('page', String(page));
+  }
+
+  if (details !== null) {
+    params.set('details', String(details));
+  }
+
+  const queryString = params.toString();
+
+  return queryString ? `?${queryString}` : '/';
+}

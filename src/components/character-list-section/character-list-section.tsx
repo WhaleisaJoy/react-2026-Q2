@@ -1,3 +1,5 @@
+'use client';
+
 import { useTranslations } from 'next-intl';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { toggleCharacterSelection } from '../../store/characters-reducer/characters-reducer';
@@ -5,17 +7,14 @@ import { getSelectedCharacterIds } from '../../store/characters-reducer/selector
 import type { Character } from '../../types/character';
 import { CharacterCard } from '../character-card/character-card';
 import { CharacterList } from '../character-list/character-list';
-import { ErrorMessage } from '../shared/error-message/error-message';
-import { Loader } from '../shared/loader/loader';
 
 interface Props {
-  isLoading: boolean;
-  error: string | null;
   characters: Character[];
   selectedCharacterId: number | null;
-  onSelectCharacter: (id: number) => void;
+  searchValue: string;
+  currentPage: number;
 }
-export function CharacterListSection({ isLoading, error, characters, selectedCharacterId, onSelectCharacter }: Props) {
+export function CharacterListSection({ characters, selectedCharacterId, searchValue, currentPage }: Props) {
   const t = useTranslations('characterListSection');
   const dispatch = useAppDispatch();
 
@@ -24,12 +23,6 @@ export function CharacterListSection({ isLoading, error, characters, selectedCha
   const onSelectionToggle = (character: Character) => {
     dispatch(toggleCharacterSelection(character));
   };
-
-  if (isLoading) return <Loader />;
-
-  if (error) {
-    return <ErrorMessage message={error} />;
-  }
 
   if (characters.length === 0) {
     return <p className="app__no-results">{t('noResults')}</p>;
@@ -44,7 +37,8 @@ export function CharacterListSection({ isLoading, error, characters, selectedCha
             isCardSelected={character.id === selectedCharacterId}
             isCheckboxSelected={selectedCharactersId.includes(character.id)}
             isLcpImage={index < 3}
-            onCardSelect={onSelectCharacter}
+            searchValue={searchValue}
+            currentPage={currentPage}
             onCheckboxToggle={onSelectionToggle}
           />
         </div>

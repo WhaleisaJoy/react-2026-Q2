@@ -1,4 +1,6 @@
-﻿import './language-switcher.scss';
+﻿'use client';
+
+import './language-switcher.scss';
 import { useState, useTransition } from 'react';
 import { useLocale, useTranslations, type Locale } from 'next-intl';
 import { routing } from '../../i18n/routing';

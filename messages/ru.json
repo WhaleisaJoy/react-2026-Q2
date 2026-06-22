@@ -36,6 +36,7 @@
   },
   "characterCard": {
     "select": "Выбрать {name}",
+    "openDetails": "Открыть детали персонажа {name}",
     "species": "Вид",
     "gender": "Пол"
   },

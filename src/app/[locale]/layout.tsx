@@ -4,7 +4,7 @@ import type { PropsWithChildren } from 'react';
 import { Providers } from '../providers';
 import { Header } from '../../components/header/header';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import { getTranslations } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 import { routing } from '../../i18n/routing';
 import { notFound } from 'next/navigation';
 
@@ -37,10 +37,12 @@ export default async function RootLayout({ params, children }: PropsWithChildren
     notFound();
   }
 
+  const messages = await getMessages({ locale });
+
   return (
     <html lang={locale}>
       <body>
-        <NextIntlClientProvider>
+        <NextIntlClientProvider key={locale} locale={locale} messages={messages}>
           <Providers>
             <div className="app">
               <Header />

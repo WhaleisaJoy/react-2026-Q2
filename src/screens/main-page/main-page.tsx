@@ -1,75 +1,63 @@
-'use client';
-
 import './main-page.scss';
 import { ErrorTestButton } from '../../components/error-test-button/error-test-button';
 import { Search } from '../../components/search/search';
 import { Pagination } from '../../components/pagination/pagination';
 import { CharacterListSection } from '../../components/character-list-section/character-list-section';
-import { useMainPage } from '../../hooks/use-main-page';
 import { SelectionBar } from '../../components/selection-bar/selection-bar';
-import { Button } from '../../components/shared/button/button';
-import { Loader } from '../../components/shared/loader/loader';
+import type { Character } from '../../types/character';
+import { RefreshButton } from '../../refresh-button/refresh-button';
+import { buildSearchUrl } from '../../utils/url-params.utils';
 import { CharacterDetails } from '../../components/character-details/character-details';
-import { useTranslations } from 'next-intl';
 
-export function MainPage() {
-  const t = useTranslations('mainPage');
-  const {
-    characters,
-    isLoading,
-    isFetching,
-    errorMessage,
-    currentPage,
-    totalPages,
-    searchValue,
-    selectedCharacterId,
-    shouldShowPagination,
-    handleSearchChange,
-    handleSearchSubmit,
-    handlePageChange,
-    openDetails,
-    closeDetails,
-    handleRefresh,
-  } = useMainPage();
+interface Props {
+  characters: Character[];
+  totalPages: number;
+  currentPage: number;
+  searchValue: string;
+  selectedCharacterId: number | null;
+}
+
+export function MainPage({ characters, totalPages, currentPage, searchValue, selectedCharacterId }: Props) {
+  const shouldShowPagination = characters.length > 0 && totalPages > 1;
 
   return (
     <div className={`main-page ${selectedCharacterId ? 'main-page--with-details' : ''}`}>
       <section className="main-page__content">
-        <Search value={searchValue} onChange={handleSearchChange} onSubmit={handleSearchSubmit} />
+        <Search initialValue={searchValue} />
 
         <div className="error-button-wrapper">
           <ErrorTestButton />
-          <Button onClick={handleRefresh} disabled={isFetching}>
-            {isFetching ? t('refreshing') : t('refresh')}
-          </Button>
+          <RefreshButton />
         </div>
 
         <div className="main-page__list-wrapper">
           <CharacterListSection
-            isLoading={isLoading}
-            error={errorMessage}
             characters={characters}
             selectedCharacterId={selectedCharacterId}
-            onSelectCharacter={openDetails}
+            searchValue={searchValue}
+            currentPage={currentPage}
           />
-
-          {isFetching && !isLoading && characters.length > 0 && (
-            <div className="main-page__list-refreshing" aria-label={t('refreshingCharacters')}>
-              <div className="main-page__list-loader">
-                <Loader />
-              </div>
-            </div>
-          )}
         </div>
 
         {shouldShowPagination && (
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            searchValue={searchValue}
+            selectedCharacterId={selectedCharacterId}
+          />
         )}
       </section>
 
       {selectedCharacterId && (
         <aside className="main-page__details">
-          <CharacterDetails selectedCharacterId={selectedCharacterId} onClose={closeDetails} />
+          <CharacterDetails
+            selectedCharacterId={selectedCharacterId}
+            closeHref={buildSearchUrl({
+              searchValue,
+              page: currentPage,
+            })}
+          />
         </aside>
       )}
 
