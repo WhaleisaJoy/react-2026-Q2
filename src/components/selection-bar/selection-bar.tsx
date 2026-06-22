@@ -3,7 +3,6 @@ import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getSelectedCharacters, getSelectedCharactersCount } from '../../store/characters-reducer/selectors';
 import { Button } from '../shared/button/button';
 import { clearSelectedCharacters } from '../../store/characters-reducer/characters-reducer';
-import { exportSelectedCharactersToCsv } from '../../utils/character-export.utils';
 import { useTranslations } from 'next-intl';
 
 export function SelectionBar() {
@@ -18,10 +17,6 @@ export function SelectionBar() {
     dispatch(clearSelectedCharacters());
   };
 
-  const handleDownload = () => {
-    exportSelectedCharactersToCsv(selectedCharacters);
-  };
-
   return (
     <div className="selection-bar">
       <div className="selection-bar__info">
@@ -31,7 +26,13 @@ export function SelectionBar() {
 
       <div className="selection-bar__actions">
         <Button onClick={handleUnselectAll}>{t('unselectAll')}</Button>
-        <Button onClick={handleDownload}>{t('download')}</Button>
+
+        <form action="/api/export/characters" method="post">
+          {selectedCharacters.map((character) => (
+            <input key={character.id} type="hidden" name="ids" value={character.id} />
+          ))}
+          <Button type="submit">{t('download')}</Button>
+        </form>
       </div>
     </div>
   );

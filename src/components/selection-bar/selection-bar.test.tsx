@@ -5,7 +5,6 @@ import { charactersReducer } from '../../store/characters-reducer/characters-red
 import { Provider } from 'react-redux';
 import { mockCharacters } from '../../test-utils/mocks/characters';
 import userEvent from '@testing-library/user-event';
-import { exportSelectedCharactersToCsv } from '../../utils/character-export.utils';
 import { renderWithIntl } from '../../test-utils/render-with-intl';
 
 const renderSelectionBar = (selectedCharactersById = {}) => {
@@ -26,10 +25,6 @@ const renderSelectionBar = (selectedCharactersById = {}) => {
     </Provider>
   );
 };
-
-vi.mock('../../utils/character-export.utils', () => ({
-  exportSelectedCharactersToCsv: vi.fn(),
-}));
 
 describe('SectionBar', () => {
   it('should not render when no characters are selected', () => {
@@ -62,15 +57,16 @@ describe('SectionBar', () => {
     expect(screen.queryByRole('button', { name: /unselect all/i })).not.toBeInTheDocument();
   });
 
-  it('should call exportSelectedCharactersToCsv when Download is clicked', async () => {
-    const user = userEvent.setup();
-
+  it('should render CSV export form with selected character ids', () => {
     renderSelectionBar({
       [mockCharacters[0].id]: mockCharacters[0],
     });
 
-    await user.click(screen.getByRole('button', { name: /download/i }));
-    expect(vi.mocked(exportSelectedCharactersToCsv)).toHaveBeenCalledTimes(1);
-    expect(vi.mocked(exportSelectedCharactersToCsv)).toHaveBeenCalledWith([mockCharacters[0]]);
+    const form = screen.getByRole('button', { name: /download/i }).closest('form');
+    const input = screen.getByDisplayValue(String(mockCharacters[0].id));
+
+    expect(form).toHaveAttribute('action', '/api/export/characters');
+    expect(form).toHaveAttribute('method', 'post');
+    expect(input).toHaveAttribute('name', 'ids');
   });
 });
