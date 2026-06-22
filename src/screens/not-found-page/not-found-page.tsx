@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl';
 import { APP_ROUTES } from '../../constants/routes';
-import { Link } from '../../i18n/navigation';
 import './not-found-page.scss';
+import { Link } from '../../i18n/navigation';
 
 export function NotFoundPage() {
   const t = useTranslations('notFoundPage');

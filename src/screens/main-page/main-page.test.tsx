@@ -7,27 +7,30 @@ import { configureStore } from '@reduxjs/toolkit';
 import { charactersReducer } from '../../store/characters-reducer/characters-reducer';
 import { Provider } from 'react-redux';
 import { ramApi } from '../../api/ramapi-service';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { renderWithIntl } from '../../test-utils/render-with-intl';
 
 const pushMock = vi.fn();
 const replaceMock = vi.fn();
+const pathnameMock = vi.hoisted(() => vi.fn());
 
 vi.mock('next/navigation', () => ({
-  usePathname: vi.fn(),
-  useRouter: vi.fn(),
   useSearchParams: vi.fn(),
+}));
+
+vi.mock('../../i18n/navigation', () => ({
+  usePathname: pathnameMock,
+  useRouter: () => ({
+    push: pushMock,
+    replace: replaceMock,
+  }),
 }));
 
 const renderMainPage = (path = '/') => {
   const [pathname, queryString = ''] = path.split('?');
 
-  vi.mocked(usePathname).mockReturnValue(pathname);
+  pathnameMock.mockReturnValue(pathname);
   vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams(queryString) as ReturnType<typeof useSearchParams>);
-  vi.mocked(useRouter).mockReturnValue({
-    push: pushMock,
-    replace: replaceMock,
-  } as unknown as ReturnType<typeof useRouter>);
 
   const store = configureStore({
     reducer: {

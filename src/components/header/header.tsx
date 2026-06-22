@@ -3,10 +3,9 @@
 import './header.scss';
 import { APP_ROUTES } from '../../constants/routes';
 import { ThemeSwitcher } from '../theme-switcher/theme-switcher';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { LanguageSwitcher } from '../language-switcher/language-switcher';
 import { useTranslations } from 'next-intl';
+import { Link, usePathname } from '../../i18n/navigation';
 
 export function Header() {
   const t = useTranslations('header');
