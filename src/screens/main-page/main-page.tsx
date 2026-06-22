@@ -10,8 +10,10 @@ import { SelectionBar } from '../../components/selection-bar/selection-bar';
 import { Button } from '../../components/shared/button/button';
 import { Loader } from '../../components/shared/loader/loader';
 import { CharacterDetails } from '../../components/character-details/character-details';
+import { useTranslations } from 'next-intl';
 
 export function MainPage() {
+  const t = useTranslations('mainPage');
   const {
     characters,
     isLoading,
@@ -38,7 +40,7 @@ export function MainPage() {
         <div className="error-button-wrapper">
           <ErrorTestButton />
           <Button onClick={handleRefresh} disabled={isFetching}>
-            {isFetching ? 'Refreshing...' : 'Refresh'}
+            {isFetching ? t('refreshing') : t('refresh')}
           </Button>
         </div>
 
@@ -52,7 +54,7 @@ export function MainPage() {
           />
 
           {isFetching && !isLoading && characters.length > 0 && (
-            <div className="main-page__list-refreshing" aria-label="Refreshing characters">
+            <div className="main-page__list-refreshing" aria-label={t('refreshingCharacters')}>
               <div className="main-page__list-loader">
                 <Loader />
               </div>

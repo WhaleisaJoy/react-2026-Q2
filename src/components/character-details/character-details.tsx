@@ -2,8 +2,9 @@ import './character-details.scss';
 import { useGetCharacterQuery } from '../../api/ramapi-service';
 import { Loader } from '../shared/loader/loader';
 import { ErrorMessage } from '../shared/error-message/error-message';
-import { getDetailsErrorMessage } from '../../api/error-messages';
+import { getDetailsErrorMessageKey } from '../../api/error-messages';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   selectedCharacterId: number;
@@ -11,12 +12,14 @@ interface Props {
 }
 
 export function CharacterDetails({ selectedCharacterId, onClose }: Props) {
+  const t = useTranslations('characterDetails');
+  const tApiErrors = useTranslations('apiErrors');
   const { data: character, isLoading, isFetching, error } = useGetCharacterQuery(selectedCharacterId);
-  const errorMessage = error ? getDetailsErrorMessage(error) : null;
+  const errorMessage = error ? tApiErrors(getDetailsErrorMessageKey(error)) : null;
 
   return (
     <div className="character-details">
-      <button className="character-details__close" type="button" onClick={onClose} aria-label="Close details">
+      <button className="character-details__close" type="button" onClick={onClose} aria-label={t('close')}>
         ×
       </button>
 
@@ -31,9 +34,10 @@ export function CharacterDetails({ selectedCharacterId, onClose }: Props) {
               className="character-details__image"
               src={character.image}
               alt={character.name}
-              loading="lazy"
+              loading="eager"
               width={150}
               height={150}
+              fetchPriority="high"
             />
           </figure>
 
@@ -41,32 +45,32 @@ export function CharacterDetails({ selectedCharacterId, onClose }: Props) {
 
           <dl className="character-details__list">
             <div className="character-details__item">
-              <dt>Status</dt>
+              <dt>{t('status')}</dt>
               <dd>{character.status}</dd>
             </div>
 
             <div className="character-details__item">
-              <dt>Species</dt>
+              <dt>{t('species')}</dt>
               <dd>{character.species}</dd>
             </div>
 
             <div className="character-details__item">
-              <dt>Gender</dt>
+              <dt>{t('gender')}</dt>
               <dd>{character.gender}</dd>
             </div>
 
             <div className="character-details__item">
-              <dt>Origin</dt>
+              <dt>{t('origin')}</dt>
               <dd>{character.origin.name}</dd>
             </div>
 
             <div className="character-details__item">
-              <dt>Location</dt>
+              <dt>{t('location')}</dt>
               <dd>{character.location.name}</dd>
             </div>
 
             <div className="character-details__item">
-              <dt>Episodes</dt>
+              <dt>{t('episodes')}</dt>
               <dd>{character.episode.length}</dd>
             </div>
           </dl>

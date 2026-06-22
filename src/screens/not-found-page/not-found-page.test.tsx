@@ -1,15 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { NotFoundPage } from './not-found-page';
-import { usePathname } from 'next/navigation';
-
-vi.mock('next/navigation', () => ({
-  usePathname: vi.fn(),
-}));
+import { renderWithIntl } from '../../test-utils/render-with-intl';
 
 const renderNotFoundPage = () => {
-  vi.mocked(usePathname);
-
-  render(<NotFoundPage />);
+  renderWithIntl(<NotFoundPage />);
 };
 
 describe('NotFoundPage', () => {

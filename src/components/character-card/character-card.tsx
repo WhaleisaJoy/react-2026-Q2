@@ -2,6 +2,7 @@ import Image from 'next/image';
 import type { Character } from '../../types/character';
 import './character-card.scss';
 import type { KeyboardEvent, MouseEvent } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   character: Character;
@@ -20,6 +21,8 @@ export function CharacterCard({
   onCardSelect,
   onCheckboxToggle,
 }: Props) {
+  const t = useTranslations('characterCard');
+
   const handleCardClick = () => {
     onCardSelect(character.id);
   };
@@ -54,7 +57,7 @@ export function CharacterCard({
       onKeyDown={handleCardKeyDown}
     >
       <label className="visually-hidden" htmlFor={`character-checkbox-${character.id}`}>
-        {`Select ${character.name}`}
+        {t('select', { name: character.name })}
       </label>
       <input
         id={`character-checkbox-${character.id}`}
@@ -89,12 +92,12 @@ export function CharacterCard({
 
           <ul className="character-card__detail-list">
             <li className="character-card__detail-item">
-              <p className="character-card__detail-title">Species</p>
+              <p className="character-card__detail-title">{t('species')}</p>
               <p className="character-card__detail-value">{character.species}</p>
             </li>
 
             <li className="character-card__detail-item">
-              <p className="character-card__detail-title">Gender</p>
+              <p className="character-card__detail-title">{t('gender')}</p>
               <p className="character-card__detail-value">{character.gender}</p>
             </li>
           </ul>

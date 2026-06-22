@@ -4,8 +4,10 @@ import { getSelectedCharacters, getSelectedCharactersCount } from '../../store/c
 import { Button } from '../shared/button/button';
 import { clearSelectedCharacters } from '../../store/characters-reducer/characters-reducer';
 import { exportSelectedCharactersToCsv } from '../../utils/character-export.utils';
+import { useTranslations } from 'next-intl';
 
 export function SelectionBar() {
+  const t = useTranslations('selectionBar');
   const dispatch = useAppDispatch();
   const selectedCharacters = useAppSelector(getSelectedCharacters);
   const selectedCharactersCount = useAppSelector(getSelectedCharactersCount);
@@ -24,12 +26,12 @@ export function SelectionBar() {
     <div className="selection-bar">
       <div className="selection-bar__info">
         <span className="selection-bar__icon"></span>
-        <span>{selectedCharactersCount} items selected</span>
+        <span>{t('selected', { count: selectedCharactersCount })}</span>
       </div>
 
       <div className="selection-bar__actions">
-        <Button onClick={handleUnselectAll}>Unselect all</Button>
-        <Button onClick={handleDownload}>Download</Button>
+        <Button onClick={handleUnselectAll}>{t('unselectAll')}</Button>
+        <Button onClick={handleDownload}>{t('download')}</Button>
       </div>
     </div>
   );

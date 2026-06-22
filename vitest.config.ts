@@ -7,6 +7,12 @@ export default defineConfig({
     setupFiles: './src/test-utils/test-utils.ts',
     exclude: ['node_modules/**', '.next/**', 'dist/**', 'out/**', 'build/**'],
 
+    server: {
+      deps: {
+        inline: ['next-intl'],
+      },
+    },
+
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'json'],

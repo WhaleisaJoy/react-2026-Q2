@@ -1,20 +1,23 @@
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { APP_ROUTES } from '../../constants/routes';
+import { Link } from '../../i18n/navigation';
 import './not-found-page.scss';
 
 export function NotFoundPage() {
+  const t = useTranslations('notFoundPage');
+
   return (
     <div className="not-found-page">
       <p className="not-found-page__code">404</p>
-      <h1 className="not-found-page__title">Page Not Found</h1>
-      <p className="not-found-page__text">The page you are looking for doesn&apos;t exist or has been moved</p>
+      <h1 className="not-found-page__title">{t('title')}</h1>
+      <p className="not-found-page__text">{t('text')}</p>
 
       <div className="not-found-page__actions">
         <Link href={APP_ROUTES.MAIN} className="not-found-page__link not-found-page__link--primary">
-          Go to Main
+          {t('mainLink')}
         </Link>
         <Link href={APP_ROUTES.ABOUT} className="not-found-page__link">
-          About Project
+          {t('aboutLink')}
         </Link>
       </div>
     </div>

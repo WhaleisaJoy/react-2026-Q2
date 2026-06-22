@@ -1,6 +1,7 @@
 import { type ChangeEvent, type SubmitEvent } from 'react';
 import { Button } from '../shared/button/button';
 import './search.scss';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   value: string;
@@ -9,6 +10,8 @@ interface Props {
 }
 
 export function Search({ value, onChange, onSubmit }: Props) {
+  const t = useTranslations('search');
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     onChange(event.target.value);
   };
@@ -26,12 +29,12 @@ export function Search({ value, onChange, onSubmit }: Props) {
         className="search__field"
         value={value}
         type="text"
-        placeholder="Search for characters..."
-        aria-label="Search characters"
+        placeholder={t('placeholder')}
+        aria-label={t('ariaLabel')}
         onChange={handleChange}
       />
 
-      <Button type="submit">Search</Button>
+      <Button type="submit">{t('submit')}</Button>
     </form>
   );
 }

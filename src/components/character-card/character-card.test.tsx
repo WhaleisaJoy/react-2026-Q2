@@ -1,8 +1,8 @@
-import { render } from '@testing-library/react';
 import { screen } from '@testing-library/react';
 import { CharacterCard } from './character-card';
 import { mockCharacters } from '../../test-utils/mocks/characters';
 import userEvent from '@testing-library/user-event';
+import { renderWithIntl } from '../../test-utils/render-with-intl';
 
 describe('CharacterCard', () => {
   const mockCharacter = mockCharacters[0];
@@ -10,7 +10,7 @@ describe('CharacterCard', () => {
   const onCheckboxToggle = vi.fn();
 
   const renderCharacterCard = (isSelected = false) => {
-    render(
+    renderWithIntl(
       <CharacterCard
         character={mockCharacter}
         isCardSelected={isSelected}

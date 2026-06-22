@@ -5,8 +5,11 @@ import { APP_ROUTES } from '../../constants/routes';
 import { ThemeSwitcher } from '../theme-switcher/theme-switcher';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { LanguageSwitcher } from '../language-switcher/language-switcher';
+import { useTranslations } from 'next-intl';
 
 export function Header() {
+  const t = useTranslations('header');
   const pathname = usePathname();
 
   return (
@@ -16,22 +19,23 @@ export function Header() {
       </Link>
 
       <div className="app-header__spacer">
-        <nav className="app-header__nav" aria-label="Main Navigation">
+        <nav className="app-header__nav" aria-label={t('navigationLabel')}>
           <Link
             href={APP_ROUTES.MAIN}
             className={`app-header__nav-link ${pathname === APP_ROUTES.MAIN ? 'app-header__nav-link--active' : ''}`}
           >
-            Main
+            {t('main')}
           </Link>
           <Link
             href={APP_ROUTES.ABOUT}
             className={`app-header__nav-link ${pathname === APP_ROUTES.ABOUT ? 'app-header__nav-link--active' : ''}`}
           >
-            About
+            {t('about')}
           </Link>
         </nav>
 
         <ThemeSwitcher />
+        <LanguageSwitcher />
       </div>
     </header>
   );

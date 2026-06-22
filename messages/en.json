@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "title": "RickVerse Search",
+    "description": "Rick and Morty characters search app"
+  },
+  "header": {
+    "main": "Main",
+    "about": "About",
+    "navigationLabel": "Main navigation"
+  },
+  "languageSwitcher": {
+    "label": "Language",
+    "triggerLabel": "Change language",
+    "en": "English (US)",
+    "ru": "Russian"
+  },
+  "themeSwitcher": {
+    "label": "Toggle theme"
+  },
+  "search": {
+    "placeholder": "Search for characters...",
+    "ariaLabel": "Search characters",
+    "submit": "Search"
+  },
+  "mainPage": {
+    "refresh": "Refresh",
+    "refreshing": "Refreshing...",
+    "refreshingCharacters": "Refreshing characters"
+  },
+  "characterListSection": {
+    "noResults": "No characters found"
+  },
+  "pagination": {
+    "label": "Pagination",
+    "pageInfo": "Page {currentPage} of {totalPages}"
+  },
+  "characterCard": {
+    "select": "Select {name}",
+    "species": "Species",
+    "gender": "Gender"
+  },
+  "characterDetails": {
+    "close": "Close details",
+    "status": "Status",
+    "species": "Species",
+    "gender": "Gender",
+    "origin": "Origin",
+    "location": "Location",
+    "episodes": "Episodes"
+  },
+  "selectionBar": {
+    "selected": "{count, plural, one {# item selected} other {# items selected}}",
+    "unselectAll": "Unselect all",
+    "download": "Download"
+  },
+  "aboutPage": {
+    "title": "About the Project",
+    "description": "RickVerse Search is a React application that allows users to explore characters from the Rick and Morty universe. It fetches character data from the Rick and Morty API and displays it in a user-friendly interface. Users can browse through characters, view their details, and navigate through different pages of results.",
+    "authorTitle": "Author",
+    "authorDescription": "Frontend developer and student building this project as part of a React learning journey. Focused on clean UI, reusable components and async data handling.",
+    "mentorTitle": "Mentor",
+    "mentorDescription": "Guided the project architecture, shared best practices and helped improve code quality and component structure.",
+    "courseTitle": "Course",
+    "courseDescription": "This project was created during a frontend course focused on modern React development, component-based architecture and practical application building.",
+    "courseLink": "Course link: "
+  },
+  "notFoundPage": {
+    "title": "Page Not Found",
+    "text": "The page you are looking for doesn't exist or has been moved",
+    "mainLink": "Go to Main",
+    "aboutLink": "About Project"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong.",
+    "message": "Please try refreshing the page or come back later.",
+    "reload": "Reload app"
+  },
+  "errorMessage": {
+    "defaultTitle": "Oops!"
+  },
+  "errorTestButton": {
+    "label": "Throw error"
+  },
+  "loader": {
+    "label": "Loading"
+  },
+  "apiErrors": {
+    "charactersNotFound": "No characters found. Try another search term.",
+    "charactersBadRequest": "The request was incorrect. Please check your search and try again.",
+    "charactersServerError": "Something went wrong on the server. Please try again later.",
+    "charactersUnknownError": "Something went wrong. Please try again later.",
+    "detailsNotFound": "Character details were not found.",
+    "detailsBadRequest": "Unable to load character details. Please try another character.",
+    "detailsServerError": "Details server is currently unavailable. Please try again later.",
+    "detailsUnknownError": "Something went wrong while loading character details."
+  }
+}

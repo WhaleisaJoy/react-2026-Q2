@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { Component } from 'react';
 import { ErrorBoundary } from './error-boundary';
 import userEvent from '@testing-library/user-event';
+import { renderWithIntl } from '../../test-utils/render-with-intl';
 
 let shouldThrowError = true;
 
@@ -24,7 +25,7 @@ describe('ErrorBoundary', () => {
   it('should render children when no error is thrown', () => {
     shouldThrowError = false;
 
-    render(
+    renderWithIntl(
       <ErrorBoundary>
         <ComponentWithPossibleError />
       </ErrorBoundary>
@@ -34,7 +35,7 @@ describe('ErrorBoundary', () => {
   });
 
   it('should render fallback UI when error is thrown', () => {
-    render(
+    renderWithIntl(
       <ErrorBoundary>
         <ComponentWithPossibleError />
       </ErrorBoundary>
@@ -46,7 +47,7 @@ describe('ErrorBoundary', () => {
   });
 
   it('should log error to console when error is thrown', () => {
-    render(
+    renderWithIntl(
       <ErrorBoundary>
         <ComponentWithPossibleError />
       </ErrorBoundary>
@@ -58,7 +59,7 @@ describe('ErrorBoundary', () => {
   it('should render children after clicking reload button if error is fixed', async () => {
     const user = userEvent.setup();
 
-    render(
+    renderWithIntl(
       <ErrorBoundary>
         <ComponentWithPossibleError />
       </ErrorBoundary>

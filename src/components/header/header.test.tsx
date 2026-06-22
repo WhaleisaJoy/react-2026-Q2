@@ -1,18 +1,27 @@
-import { render } from '@testing-library/react';
 import { screen } from '@testing-library/react';
 import { Header } from './header';
 import { usePathname } from 'next/navigation';
 import { APP_ROUTES } from '../../constants/routes';
 import { ThemeProvider } from '../../context/theme-provider';
+import { renderWithIntl } from '../../test-utils/render-with-intl';
+
+const replaceMock = vi.hoisted(() => vi.fn());
 
 vi.mock('next/navigation', () => ({
   usePathname: vi.fn(),
 }));
 
+vi.mock('../../i18n/navigation', () => ({
+  usePathname: () => '/',
+  useRouter: () => ({
+    replace: replaceMock,
+  }),
+}));
+
 const renderHeader = (path = '/') => {
   vi.mocked(usePathname).mockReturnValue(path);
 
-  render(
+  renderWithIntl(
     <ThemeProvider>
       <Header />
     </ThemeProvider>

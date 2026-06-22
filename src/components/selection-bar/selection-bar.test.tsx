@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { SelectionBar } from './selection-bar';
 import { configureStore } from '@reduxjs/toolkit';
 import { charactersReducer } from '../../store/characters-reducer/characters-reducer';
@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import { mockCharacters } from '../../test-utils/mocks/characters';
 import userEvent from '@testing-library/user-event';
 import { exportSelectedCharactersToCsv } from '../../utils/character-export.utils';
+import { renderWithIntl } from '../../test-utils/render-with-intl';
 
 const renderSelectionBar = (selectedCharactersById = {}) => {
   const store = configureStore({
@@ -19,7 +20,7 @@ const renderSelectionBar = (selectedCharactersById = {}) => {
     },
   });
 
-  render(
+  renderWithIntl(
     <Provider store={store}>
       <SelectionBar />
     </Provider>
@@ -54,7 +55,7 @@ describe('SectionBar', () => {
       [mockCharacters[0].id]: mockCharacters[0],
     });
 
-    expect(screen.getByText('1 items selected')).toBeInTheDocument();
+    expect(screen.getByText('1 item selected')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /unselect all/i }));
 

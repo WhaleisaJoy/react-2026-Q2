@@ -1,23 +1,24 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Search } from './search';
+import { renderWithIntl } from '../../test-utils/render-with-intl';
 
 describe('Search', () => {
   it('should render search input and button', () => {
-    render(<Search value="" onChange={vi.fn()} onSubmit={vi.fn()} />);
+    renderWithIntl(<Search value="" onChange={vi.fn()} onSubmit={vi.fn()} />);
 
     expect(screen.getByRole('textbox', { name: /search characters/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /search/i })).toBeInTheDocument();
   });
 
   it('should render provided value in the input', () => {
-    render(<Search value="test value" onChange={vi.fn()} onSubmit={vi.fn()} />);
+    renderWithIntl(<Search value="test value" onChange={vi.fn()} onSubmit={vi.fn()} />);
 
     expect(screen.getByRole('textbox', { name: /search characters/i })).toHaveValue('test value');
   });
 
   it('should render empty input when value is empty', () => {
-    render(<Search value="" onChange={vi.fn()} onSubmit={vi.fn()} />);
+    renderWithIntl(<Search value="" onChange={vi.fn()} onSubmit={vi.fn()} />);
 
     expect(screen.getByRole('textbox', { name: /search characters/i })).toHaveValue('');
   });
@@ -26,7 +27,7 @@ describe('Search', () => {
     const user = userEvent.setup();
     const handleChange = vi.fn();
 
-    render(<Search value="" onChange={handleChange} onSubmit={vi.fn()} />);
+    renderWithIntl(<Search value="" onChange={handleChange} onSubmit={vi.fn()} />);
 
     const input = screen.getByRole('textbox', { name: /search characters/i });
     await user.type(input, 'r');
@@ -39,7 +40,7 @@ describe('Search', () => {
     const user = userEvent.setup();
     const handleSubmit = vi.fn();
 
-    render(<Search value="" onChange={vi.fn()} onSubmit={handleSubmit} />);
+    renderWithIntl(<Search value="" onChange={vi.fn()} onSubmit={handleSubmit} />);
 
     const button = screen.getByRole('button', { name: /search/i });
     await user.click(button);
@@ -51,7 +52,7 @@ describe('Search', () => {
     const user = userEvent.setup();
     const handleSubmit = vi.fn();
 
-    render(<Search value="" onChange={vi.fn()} onSubmit={handleSubmit} />);
+    renderWithIntl(<Search value="" onChange={vi.fn()} onSubmit={handleSubmit} />);
 
     const input = screen.getByRole('textbox', { name: /search characters/i });
     await user.type(input, '{Enter}');

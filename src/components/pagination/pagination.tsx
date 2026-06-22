@@ -1,5 +1,6 @@
 import './pagination.scss';
 import { Button } from '../shared/button/button';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   currentPage: number;
@@ -8,6 +9,8 @@ interface Props {
 }
 
 export function Pagination({ currentPage, totalPages, onPageChange }: Props) {
+  const t = useTranslations('pagination');
+
   const handlePreviousClick = () => {
     onPageChange(currentPage - 1);
   };
@@ -17,13 +20,16 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Props) {
   };
 
   return (
-    <nav className="pagination" aria-label="Pagination">
+    <nav className="pagination" aria-label={t('label')}>
       <Button onClick={handlePreviousClick} disabled={currentPage === 1}>
         &lt;
       </Button>
 
       <span>
-        Page {currentPage} of {totalPages}
+        {t('pageInfo', {
+          currentPage,
+          totalPages,
+        })}
       </span>
 
       <Button onClick={handleNextClick} disabled={currentPage === totalPages}>

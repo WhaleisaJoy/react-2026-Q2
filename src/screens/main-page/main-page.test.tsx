@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { LOCAL_STORAGE_KEYS } from '../../constants/local-storage';
 import userEvent from '@testing-library/user-event';
 import { mockCharacters, mockCharactersResponse } from '../../test-utils/mocks/characters';
@@ -8,6 +8,7 @@ import { charactersReducer } from '../../store/characters-reducer/characters-red
 import { Provider } from 'react-redux';
 import { ramApi } from '../../api/ramapi-service';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { renderWithIntl } from '../../test-utils/render-with-intl';
 
 const pushMock = vi.fn();
 const replaceMock = vi.fn();
@@ -36,7 +37,7 @@ const renderMainPage = (path = '/') => {
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(ramApi.middleware),
   });
 
-  render(
+  renderWithIntl(
     <Provider store={store}>
       <MainPage />
     </Provider>

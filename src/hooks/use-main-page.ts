@@ -4,8 +4,9 @@ import { getValidDetailsId, getValidPage } from '../utils/url-params.utils';
 import { useUrlParams } from './use-url-params';
 import { useCharacterSearch } from './use-character-search';
 import { ramApi, useGetCharactersQuery } from '../api/ramapi-service';
-import { getCharactersErrorMessage } from '../api/error-messages';
+import { getCharactersErrorMessageKey } from '../api/error-messages';
 import { useAppDispatch } from '.';
+import { useTranslations } from 'next-intl';
 
 interface UseMainPageResult {
   characters: Character[];
@@ -26,6 +27,7 @@ interface UseMainPageResult {
 }
 
 export function useMainPage(): UseMainPageResult {
+  const tApiErrors = useTranslations('apiErrors');
   const dispatch = useAppDispatch();
 
   const { searchParams, updateUrlParams } = useUrlParams();
@@ -62,7 +64,7 @@ export function useMainPage(): UseMainPageResult {
 
   const characters = data?.results ?? [];
   const totalPages = data?.info.pages ?? 1;
-  const errorMessage = error ? getCharactersErrorMessage(error) : null;
+  const errorMessage = error ? tApiErrors(getCharactersErrorMessageKey(error)) : null;
 
   const handlePageChange = (page: number) => {
     if (page === currentPage) {

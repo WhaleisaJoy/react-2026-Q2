@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CharacterListSection } from './character-list-section';
 import { mockCharacters } from '../../test-utils/mocks/characters';
@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import type { ComponentProps } from 'react';
 import { configureStore } from '@reduxjs/toolkit';
 import { charactersReducer } from '../../store/characters-reducer/characters-reducer';
+import { renderWithIntl } from '../../test-utils/render-with-intl';
 
 const renderCharacterListSection = (props: Partial<ComponentProps<typeof CharacterListSection>> = {}) => {
   const store = configureStore({
@@ -14,7 +15,7 @@ const renderCharacterListSection = (props: Partial<ComponentProps<typeof Charact
     },
   });
 
-  render(
+  renderWithIntl(
     <Provider store={store}>
       <CharacterListSection
         isLoading={false}

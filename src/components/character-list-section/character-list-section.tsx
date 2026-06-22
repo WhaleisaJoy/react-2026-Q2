@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { toggleCharacterSelection } from '../../store/characters-reducer/characters-reducer';
 import { getSelectedCharacterIds } from '../../store/characters-reducer/selectors';
@@ -15,6 +16,7 @@ interface Props {
   onSelectCharacter: (id: number) => void;
 }
 export function CharacterListSection({ isLoading, error, characters, selectedCharacterId, onSelectCharacter }: Props) {
+  const t = useTranslations('characterListSection');
   const dispatch = useAppDispatch();
 
   const selectedCharactersId = useAppSelector(getSelectedCharacterIds);
@@ -30,7 +32,7 @@ export function CharacterListSection({ isLoading, error, characters, selectedCha
   }
 
   if (characters.length === 0) {
-    return <p className="app__no-results">No characters found</p>;
+    return <p className="app__no-results">{t('noResults')}</p>;
   }
 
   return (
