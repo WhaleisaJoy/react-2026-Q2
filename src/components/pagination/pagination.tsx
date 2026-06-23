@@ -1,34 +1,57 @@
 import './pagination.scss';
+import { useTranslations } from 'next-intl';
+import { Link } from '../../i18n/navigation';
+import { buildSearchUrl } from '../../utils/url-params.utils';
 import { Button } from '../shared/button/button';
 
 interface Props {
   currentPage: number;
   totalPages: number;
-  onPageChange: (page: number) => void;
+  searchValue: string;
+  selectedCharacterId: number | null;
 }
 
-export function Pagination({ currentPage, totalPages, onPageChange }: Props) {
-  const handlePreviousClick = () => {
-    onPageChange(currentPage - 1);
-  };
-
-  const handleNextClick = () => {
-    onPageChange(currentPage + 1);
-  };
+export function Pagination({ currentPage, totalPages, searchValue, selectedCharacterId }: Props) {
+  const t = useTranslations('pagination');
 
   return (
-    <nav className="pagination" aria-label="Pagination">
-      <Button onClick={handlePreviousClick} disabled={currentPage === 1}>
-        &lt;
-      </Button>
+    <nav className="pagination" aria-label={t('label')}>
+      {currentPage === 1 ? (
+        <Button disabled>&lt;</Button>
+      ) : (
+        <Link
+          className="button pagination__link"
+          href={buildSearchUrl({
+            searchValue,
+            page: currentPage - 1,
+            details: selectedCharacterId,
+          })}
+        >
+          &lt;
+        </Link>
+      )}
 
       <span>
-        Page {currentPage} of {totalPages}
+        {t('pageInfo', {
+          currentPage,
+          totalPages,
+        })}
       </span>
 
-      <Button onClick={handleNextClick} disabled={currentPage === totalPages}>
-        &gt;
-      </Button>
+      {currentPage === totalPages ? (
+        <Button disabled>&gt;</Button>
+      ) : (
+        <Link
+          className="button pagination__link"
+          href={buildSearchUrl({
+            searchValue,
+            page: currentPage + 1,
+            details: selectedCharacterId,
+          })}
+        >
+          &gt;
+        </Link>
+      )}
     </nav>
   );
 }

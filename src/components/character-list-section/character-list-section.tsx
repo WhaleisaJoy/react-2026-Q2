@@ -1,20 +1,21 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { toggleCharacterSelection } from '../../store/characters-reducer/characters-reducer';
 import { getSelectedCharacterIds } from '../../store/characters-reducer/selectors';
 import type { Character } from '../../types/character';
 import { CharacterCard } from '../character-card/character-card';
 import { CharacterList } from '../character-list/character-list';
-import { ErrorMessage } from '../shared/error-message/error-message';
-import { Loader } from '../shared/loader/loader';
 
 interface Props {
-  isLoading: boolean;
-  error: string | null;
   characters: Character[];
   selectedCharacterId: number | null;
-  onSelectCharacter: (id: number) => void;
+  searchValue: string;
+  currentPage: number;
 }
-export function CharacterListSection({ isLoading, error, characters, selectedCharacterId, onSelectCharacter }: Props) {
+export function CharacterListSection({ characters, selectedCharacterId, searchValue, currentPage }: Props) {
+  const t = useTranslations('characterListSection');
   const dispatch = useAppDispatch();
 
   const selectedCharactersId = useAppSelector(getSelectedCharacterIds);
@@ -23,25 +24,21 @@ export function CharacterListSection({ isLoading, error, characters, selectedCha
     dispatch(toggleCharacterSelection(character));
   };
 
-  if (isLoading) return <Loader />;
-
-  if (error) {
-    return <ErrorMessage message={error} />;
-  }
-
   if (characters.length === 0) {
-    return <p className="app__no-results">No characters found</p>;
+    return <p className="app__no-results">{t('noResults')}</p>;
   }
 
   return (
     <CharacterList>
-      {characters.map((character) => (
+      {characters.map((character, index) => (
         <div key={character.id} className="character-list__item">
           <CharacterCard
             character={character}
             isCardSelected={character.id === selectedCharacterId}
             isCheckboxSelected={selectedCharactersId.includes(character.id)}
-            onCardSelect={onSelectCharacter}
+            isLcpImage={index < 3}
+            searchValue={searchValue}
+            currentPage={currentPage}
             onCheckboxToggle={onSelectionToggle}
           />
         </div>

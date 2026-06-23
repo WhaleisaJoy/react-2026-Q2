@@ -1,41 +1,51 @@
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 
-export function getCharactersErrorMessage(error: unknown): string {
+export type ApiErrorMessageKey =
+  | 'charactersNotFound'
+  | 'charactersBadRequest'
+  | 'charactersServerError'
+  | 'charactersUnknownError'
+  | 'detailsNotFound'
+  | 'detailsBadRequest'
+  | 'detailsServerError'
+  | 'detailsUnknownError';
+
+export function getCharactersErrorMessageKey(error: unknown): ApiErrorMessageKey {
   if (typeof error === 'object' && error !== null && 'status' in error) {
     const status = Number((error as FetchBaseQueryError).status);
 
     if (status === 404) {
-      return 'No characters found. Try another search term.';
+      return 'charactersNotFound';
     }
 
     if (status >= 400 && status < 500) {
-      return 'The request was incorrect. Please check your search and try again.';
+      return 'charactersBadRequest';
     }
 
     if (status >= 500) {
-      return 'Something went wrong on the server. Please try again later.';
+      return 'charactersServerError';
     }
   }
 
-  return 'Something went wrong. Please try again later.';
+  return 'charactersUnknownError';
 }
 
-export function getDetailsErrorMessage(error: unknown): string {
+export function getDetailsErrorMessageKey(error: unknown): ApiErrorMessageKey {
   if (typeof error === 'object' && error !== null && 'status' in error) {
     const status = Number((error as FetchBaseQueryError).status);
 
     if (status === 404) {
-      return 'Character details were not found.';
+      return 'detailsNotFound';
     }
 
     if (status >= 400 && status < 500) {
-      return 'Unable to load character details. Please try another character.';
+      return 'detailsBadRequest';
     }
 
     if (status >= 500) {
-      return 'Details server is currently unavailable. Please try again later.';
+      return 'detailsServerError';
     }
   }
 
-  return 'Something went wrong while loading character details.';
+  return 'detailsUnknownError';
 }

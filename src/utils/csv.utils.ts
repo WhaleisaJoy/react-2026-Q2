@@ -1,3 +1,5 @@
+import type { Character } from '../types/character';
+
 type CsvRow = Record<string, string | number>;
 
 const CSV_SEPARATOR = ';';
@@ -26,14 +28,18 @@ export function convertToCsv(data: CsvRow[]): string {
   return csvData;
 }
 
-export function downloadCsv(csvData: string, filename?: string) {
-  const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-
-  link.setAttribute('href', url);
-  link.setAttribute('download', `${filename}.csv`);
-
-  link.click();
-  URL.revokeObjectURL(url);
+export function createCharacterCsvRows(characters: Character[], origin: string) {
+  return characters.map((character) => ({
+    id: character.id,
+    name: character.name,
+    status: character.status,
+    species: character.species,
+    gender: character.gender,
+    origin: character.origin.name,
+    location: character.location.name,
+    episodesCount: character.episode.length,
+    detailsUrl: `${origin}/?details=${character.id}`,
+    apiUrl: character.url,
+    imageUrl: character.image,
+  }));
 }

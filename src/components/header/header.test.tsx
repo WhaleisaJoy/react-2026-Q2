@@ -1,17 +1,31 @@
-import { render } from '@testing-library/react';
 import { screen } from '@testing-library/react';
 import { Header } from './header';
-import { MemoryRouter } from 'react-router';
-import { APP_ROUTES } from '../../router/routes';
+import { APP_ROUTES } from '../../constants/routes';
 import { ThemeProvider } from '../../context/theme-provider';
+import { renderWithIntl } from '../../test-utils/render-with-intl';
+
+const replaceMock = vi.hoisted(() => vi.fn());
+const pathnameMock = vi.hoisted(() => vi.fn());
+
+vi.mock('../../i18n/navigation', () => ({
+  Link: ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
+  usePathname: pathnameMock,
+  useRouter: () => ({
+    replace: replaceMock,
+  }),
+}));
 
 const renderHeader = (path = '/') => {
-  render(
-    <MemoryRouter initialEntries={[path]}>
-      <ThemeProvider>
-        <Header />
-      </ThemeProvider>
-    </MemoryRouter>
+  pathnameMock.mockReturnValue(path);
+
+  renderWithIntl(
+    <ThemeProvider>
+      <Header />
+    </ThemeProvider>
   );
 };
 
@@ -25,9 +39,9 @@ describe('Header', () => {
   it('should render navigation links', () => {
     renderHeader();
 
-    expect(screen.getByRole('link', { name: /rickverse search/i })).toHaveAttribute('href', APP_ROUTES.MAIN.to);
-    expect(screen.getByRole('link', { name: /main/i })).toHaveAttribute('href', APP_ROUTES.MAIN.to);
-    expect(screen.getByRole('link', { name: /about/i })).toHaveAttribute('href', APP_ROUTES.ABOUT.to);
+    expect(screen.getByRole('link', { name: /rickverse search/i })).toHaveAttribute('href', APP_ROUTES.MAIN);
+    expect(screen.getByRole('link', { name: /main/i })).toHaveAttribute('href', APP_ROUTES.MAIN);
+    expect(screen.getByRole('link', { name: /about/i })).toHaveAttribute('href', APP_ROUTES.ABOUT);
   });
 
   it('should mark main link as active on main page', () => {

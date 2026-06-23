@@ -1,11 +1,12 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { ErrorTestButton } from './error-test-button';
 import userEvent from '@testing-library/user-event';
 import { ErrorBoundary } from '../error-boundary/error-boundary';
+import { renderWithIntl } from '../../test-utils/render-with-intl';
 
 describe('ErrorTestButton', () => {
   it('should render button', () => {
-    render(<ErrorTestButton />);
+    renderWithIntl(<ErrorTestButton />);
 
     expect(screen.getByRole('button', { name: /throw error/i })).toBeInTheDocument();
   });
@@ -15,7 +16,7 @@ describe('ErrorTestButton', () => {
 
     vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    render(
+    renderWithIntl(
       <ErrorBoundary>
         <ErrorTestButton />
       </ErrorBoundary>

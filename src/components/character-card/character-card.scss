@@ -1,10 +1,10 @@
 .character-card {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: 20px;
   width: 100%;
   height: 100%;
-  padding: 20px;
   color: var(--text-main);
   background-color: var(--card-bg);
   border: 1px solid var(--accent);
@@ -16,11 +16,6 @@
   );
   cursor: pointer;
   transition: all 0.3s ease;
-
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 4px;
-  }
 
   &:not(&--selected):hover {
     transform: translateY(-2px) scale(1.01);
@@ -34,6 +29,20 @@
       0 0 0px 1px color-mix(in srgb, var(--accent) 70%, transparent);
     cursor: default;
     z-index: 1;
+  }
+
+  &__link {
+    display: block;
+    padding: 20px;
+    padding-left: 62px;
+    width: 100%;
+    color: inherit;
+    text-decoration: none;
+
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
   }
 
   &__body {
@@ -110,7 +119,9 @@
 
   &__checkbox {
     appearance: none;
-    position: relative;
+    position: absolute;
+    top: 20px;
+    left: 20px;
     display: inline-flex;
     margin: 0;
     width: 22px;
@@ -120,6 +131,7 @@
     border: 1px solid var(--text-muted);
     border-radius: 6px;
     cursor: pointer;
+    z-index: 2;
 
     &:hover,
     &:active,

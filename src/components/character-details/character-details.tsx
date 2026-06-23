@@ -1,85 +1,71 @@
 import './character-details.scss';
-import { useOutletContext } from 'react-router';
-import { useGetCharacterQuery } from '../../api/ramapi-service';
-import { Loader } from '../shared/loader/loader';
-import { ErrorMessage } from '../shared/error-message/error-message';
-import { getDetailsErrorMessage } from '../../api/error-messages';
+import Image from 'next/image';
+import { getTranslations } from 'next-intl/server';
+import { fetchCharacterById } from '../../api/ramapi-server';
+import { Link } from '../../i18n/navigation';
 
-interface Context {
+interface Props {
   selectedCharacterId: number;
-  onClose: () => void;
+  closeHref: string;
 }
 
-export function CharacterDetails() {
-  const { selectedCharacterId, onClose } = useOutletContext<Context>();
-
-  const { data: character, isLoading, isFetching, error } = useGetCharacterQuery(selectedCharacterId);
-  const errorMessage = error ? getDetailsErrorMessage(error) : null;
+export async function CharacterDetails({ selectedCharacterId, closeHref }: Props) {
+  const t = await getTranslations('characterDetails');
+  const character = await fetchCharacterById(selectedCharacterId);
 
   return (
     <div className="character-details">
-      <button className="character-details__close" type="button" onClick={onClose} aria-label="Close details">
+      <Link className="character-details__close" href={closeHref} aria-label={t('close')}>
         ×
-      </button>
+      </Link>
 
-      {isLoading && <Loader />}
+      <div className="character-details__content">
+        <figure className="character-details__image-wrapper">
+          <Image
+            className="character-details__image"
+            src={character.image}
+            alt={character.name}
+            loading="eager"
+            width={150}
+            height={150}
+            fetchPriority="high"
+          />
+        </figure>
 
-      {!isLoading && errorMessage && <ErrorMessage message={errorMessage} />}
+        <h3 className="character-details__title">{character.name}</h3>
 
-      {!isLoading && character && (
-        <div className="character-details__content">
-          <figure className="character-details__image-wrapper">
-            <img
-              className="character-details__image"
-              src={character.image}
-              alt={character.name}
-              loading="lazy"
-              width={150}
-              height={150}
-            />
-          </figure>
+        <dl className="character-details__list">
+          <div className="character-details__item">
+            <dt>{t('status')}</dt>
+            <dd>{character.status}</dd>
+          </div>
 
-          <h3 className="character-details__title">{character.name}</h3>
+          <div className="character-details__item">
+            <dt>{t('species')}</dt>
+            <dd>{character.species}</dd>
+          </div>
 
-          <dl className="character-details__list">
-            <div className="character-details__item">
-              <dt>Status</dt>
-              <dd>{character.status}</dd>
-            </div>
+          <div className="character-details__item">
+            <dt>{t('gender')}</dt>
+            <dd>{character.gender}</dd>
+          </div>
 
-            <div className="character-details__item">
-              <dt>Species</dt>
-              <dd>{character.species}</dd>
-            </div>
+          <div className="character-details__item">
+            <dt>{t('origin')}</dt>
+            <dd>{character.origin.name}</dd>
+          </div>
 
-            <div className="character-details__item">
-              <dt>Gender</dt>
-              <dd>{character.gender}</dd>
-            </div>
+          <div className="character-details__item">
+            <dt>{t('location')}</dt>
+            <dd>{character.location.name}</dd>
+          </div>
 
-            <div className="character-details__item">
-              <dt>Origin</dt>
-              <dd>{character.origin.name}</dd>
-            </div>
-
-            <div className="character-details__item">
-              <dt>Location</dt>
-              <dd>{character.location.name}</dd>
-            </div>
-
-            <div className="character-details__item">
-              <dt>Episodes</dt>
-              <dd>{character.episode.length}</dd>
-            </div>
-          </dl>
-        </div>
-      )}
-
-      {isFetching && !isLoading && character && (
-        <div className="character-details__refreshing">
-          <Loader />
-        </div>
-      )}
+          <div className="character-details__item">
+            <dt>{t('episodes')}</dt>
+            <dd>{character.episode.length}</dd>
+          </div>
+        </dl>
+      </div>
     </div>
   );
 }

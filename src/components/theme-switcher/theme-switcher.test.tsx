@@ -1,10 +1,11 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { ThemeSwitcher } from './theme-switcher';
 import { ThemeProvider } from '../../context/theme-provider';
 import userEvent from '@testing-library/user-event';
+import { renderWithIntl } from '../../test-utils/render-with-intl';
 
 const renderThemeSwitcher = () => {
-  render(
+  renderWithIntl(
     <ThemeProvider>
       <ThemeSwitcher />
     </ThemeProvider>

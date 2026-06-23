@@ -1,4 +1,4 @@
-import { convertToCsv, downloadCsv } from './csv.utils';
+import { convertToCsv } from './csv.utils';
 
 describe('convertToCsv', () => {
   it('should convert rows to CSV', () => {
@@ -24,19 +24,5 @@ describe('convertToCsv', () => {
     ]);
 
     expect(result).toBe('sep=;\nname\n"Rick; ""Scientist"""');
-  });
-});
-
-describe('downloadCsv', () => {
-  it('should create and click download link', () => {
-    const createObjectURL = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:test');
-    const revokeObjectURL = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
-    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
-
-    downloadCsv('csv-data', 'test-file');
-
-    expect(createObjectURL).toHaveBeenCalledTimes(1);
-    expect(click).toHaveBeenCalledTimes(1);
-    expect(revokeObjectURL).toHaveBeenCalledWith('blob:test');
   });
 });
